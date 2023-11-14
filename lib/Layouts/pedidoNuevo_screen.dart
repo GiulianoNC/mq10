@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mq10/Herramientas/global.dart';
 import 'package:mq10/Layouts/pedidoNuevo2_screen.dart';
 
 import '../Herramientas/boton.dart';
@@ -150,29 +151,61 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                 ),
               )
           ),
-          title: Row(
-              children:[
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+            child: Column(
+              children: [
+                SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            clienteGlobal,
+                            style: TextStyle(
+                              color: Color.fromRGBO(212, 20, 90, 1),
+                              fontSize: 10,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            razonSocialGlobal,
+                            style: TextStyle(
+                              color: Color.fromRGBO(102, 45, 145, 1),
+                              fontSize: 10,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
-                  margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
-                  //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  // alignment: Alignment.center,
-                  child: Image.asset("images/nombre.png",
-                    width: 150,
-                    height: 50,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(212, 20, 90, 1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Text(
+                    correoGlobal,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
                   ),
                 ),
-                Expanded(child: Container()), // Esto empujará el ícono hacia la derecha
-                Padding(
-                  padding: EdgeInsets.only(top: 10, right: 10), // Ajusta estos valores según tus preferencias
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    color: Colors.grey, // Cambia el color del ícono de flecha
-                  ),
-                ),
-              ]
+              ],
+            ),
           ),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(20.0),
@@ -315,6 +348,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedOptionMenu1 = newValue;
+                      tipoPedidoGlobal= newValue.toString();
                     });
                   },
                   items: menu1Options?.map<DropdownMenuItem<String>>((dynamic option) {
@@ -341,6 +375,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedOptionMenu2 = newValue;
+                      depositoGlobal = newValue.toString();
                     });
                   },
                   items: menu2Options?.map<DropdownMenuItem<String>>((dynamic option) {
@@ -369,6 +404,8 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedOptionMenu3 = newValue;
+                      monedaGlobal = newValue.toString();
+
                     });
                   },
                   items: menu3Options?.map<DropdownMenuItem<String>>((dynamic option) {
@@ -385,6 +422,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                 child: MyElevatedButton(
                   onPressed: () async {
                     navigateToIncidenteScreen(context);
+                    print(monedaGlobal+ depositoGlobal+ tipoPedidoGlobal);
 
                     // Acción al presionar el botón
                   },

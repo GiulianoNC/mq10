@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_flushbar/flutter_flushbar.dart';
 import 'package:http/http.dart' as http;
+import '../Herramientas/global.dart';
 import '../Herramientas/variables_globales.dart';
 import 'pedidoNuevo_screen.dart';
 
@@ -22,6 +22,7 @@ class _PedidosState extends State<Pedidos> {
   Set<int> selectedItems = Set<int>();
   List<dynamic> items = [];
 
+  //pedidos pendientes
   Future<Map<String, dynamic>> fetchData() async {
     final response = await http.post(
       Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1008A_ORCH'),
@@ -52,6 +53,7 @@ class _PedidosState extends State<Pedidos> {
     }
   }
 
+  //menu
   void _onMenuItemSelected(int index) {
     setState(() {
       _selectedIndex = index;
@@ -66,7 +68,7 @@ class _PedidosState extends State<Pedidos> {
         Navigator.pushNamed(context, "/mail");
         break;
       case 2:
-        Navigator.pushNamed(context, "/pedidos");
+        //Navigator.pushNamed(context, "/pedidos");
         break;
       case 3:
         Navigator.pushNamed(context, "/cobranza");
@@ -83,14 +85,12 @@ class _PedidosState extends State<Pedidos> {
     super.initState();
     fetchData(); // Llama a fetchData solo una vez cuando el widget se inicia
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:
-          ScaffoldMessenger(
-            child:      Scaffold(
-              // key: _scaffoldKey,  // Elimina esta línea
+      home: Scaffold(
               appBar: AppBar(
                 flexibleSpace: Container(
                     decoration: const BoxDecoration(
@@ -104,29 +104,61 @@ class _PedidosState extends State<Pedidos> {
                       ),
                     )
                 ),
-                title: Row(
-                    children:[
+                title: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                Text(
+                                  clienteGlobal,
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(212, 20, 90, 1),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                SizedBox(width: 10),
+                                Text(
+                                  razonSocialGlobal,
+                                  style: TextStyle(
+                                    color: Color.fromRGBO(102, 45, 145, 1),
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                       Container(
-                        margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
-                        //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                        // alignment: Alignment.center,
-                        child: Image.asset("images/nombre.png",
-                          width: 150,
-                          height: 50,
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(212, 20, 90, 1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                        child: Text(
+                          correoGlobal,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
                         ),
                       ),
-                      Expanded(child: Container()), // Esto empujará el ícono hacia la derecha
-                      Padding(
-                        padding: EdgeInsets.only(top: 10, right: 10), // Ajusta estos valores según tus preferencias
-                        child: IconButton(
-                          icon: Icon(Icons.arrow_back),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          color: Colors.grey, // Cambia el color del ícono de flecha
-                        ),
-                      ),
-                    ]
+                    ],
+                  ),
                 ),
                 bottom: PreferredSize(
                   preferredSize: Size.fromHeight(20.0),
@@ -245,8 +277,7 @@ class _PedidosState extends State<Pedidos> {
                   ),
                 ),
               ),
-              body:
-              FutureBuilder<Map<String, dynamic>>(
+              body: FutureBuilder<Map<String, dynamic>>(
                 future: fetchData(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -260,51 +291,48 @@ class _PedidosState extends State<Pedidos> {
                     if (items.isEmpty) {
                       return Center(child: Text('No hay elementos disponibles.'));
                     }
-
                     return CupertinoScrollbar(
-                      child: GridView.builder(
-                        shrinkWrap: true,
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      child: Container(
+                        height: 600, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
+                        child: ListView.builder(
+                          /*   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                        ),
-                        itemCount: items.length,  // Usa la lista de elementos a nivel de clase
-                        itemBuilder: (context, index) {
-                          final item = items[index] as Map<String, dynamic>;
-                          final isSelected = selectedItems.contains(index);
-                          final isCanceled = item['canceled'] ?? false;
+                        ),*/
+                          itemCount: items.length,
+                          itemBuilder: (context, index) {
+                            final item = items[index] as Map<String, dynamic>;
+                            final isSelected = selectedItems.contains(index);
+                            final isCanceled = item['canceled'] ?? false;
 
-                          return Card(
-                            color: isCanceled ? Colors.purple : (isSelected ? Colors.grey : Colors.white),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text('Fecha de Orden: ${item['Fecha_Orden']}'),
-                                Text('Razón Social: ${item['Razon_social']}'),
-                                Text('NRO_ORDEN: ${item['Orden_Nro']}'), // Muestra NRO_ORDEN en lugar de Fecha de Orden
-                                //  Text('DEPOSITO: ${item['Deposito']}'), // Muestra DEPOSITO en lugar de Razón Social
-                                Text('NRO_LINEA: ${item['Linea_Nro']}'),
-                                //  Text('P4210_Version: ${item['P4210_Version']}'),
-
-                                Checkbox(
-                                  value: isSelected,
-                                  onChanged: (bool? value) {
-                                    setState(() {
-                                      print('Checkbox at index $index was clicked. New value: $value');
-                                      if (value != null) {
-                                        if (value) {
-                                          selectedItems.add(index);
-                                        } else {
-                                          selectedItems.remove(index);
+                            return Card(
+                              color: isCanceled ? Colors.purple : (isSelected ? Colors.grey : Colors.white),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text('Fecha de Orden: ${item['Fecha_Orden']}'),
+                                  Text('Razón Social: ${item['Razon_social']}'),
+                                  Text('NRO_ORDEN: ${item['Orden_Nro']}'),
+                                  Text('NRO_LINEA: ${item['Linea_Nro']}'),
+                                  Checkbox(
+                                    value: isSelected,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value != null) {
+                                          if (value) {
+                                            selectedItems.add(index);
+                                          } else {
+                                            selectedItems.remove(index);
+                                          }
                                         }
-                                      }
-                                    });
-                                  },
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                                      });
+                                    },
+                                  )
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      )
                     );
                   }
                 },
@@ -320,7 +348,8 @@ class _PedidosState extends State<Pedidos> {
             ),
 
           ),
-    ));
+
+    );
   }
 }
 class BottomSheetButtons extends StatelessWidget {

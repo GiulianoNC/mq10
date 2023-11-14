@@ -172,13 +172,19 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     // Agrega la lógica para navegar a las pantallas correspondientes aquí
     switch (index) {
       case 0:
-        Navigator.pushNamed(context, "/login");
-        break;
-      case 1:
         Navigator.pushNamed(context, "/congrats");
         break;
+      case 1:
+        Navigator.pushNamed(context, "/mail");
+        break;
       case 2:
-        Navigator.pushNamed(context, "/correctivo");
+        Navigator.pushNamed(context, "/pedidos");
+        break;
+      case 3:
+        Navigator.pushNamed(context, "/cobranza");
+        break;
+      case 4:
+        Navigator.pushNamed(context, "/login");
         break;
     }
   }
@@ -271,7 +277,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                         height: 70,
                       ),
                       Text(
-                        '\nQTM - MANTENIMIENTO\n          CORRECTIVO\n\n',
+                        '\nQTM - VENTA  DIRECTA\n\n',
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.white,
@@ -279,6 +285,61 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                       ),
                     ],
                   ),
+                ),
+                ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text('Cliente',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),),
+                  selected: _selectedIndex == 0,
+                  onTap: () {
+                    _onMenuItemSelected(0);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.mail),
+                  title: Text(' Mail',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  selected: _selectedIndex == 1,
+                  onTap: () {
+                    _onMenuItemSelected(1);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.checklist,
+                    color: Colors.grey, // Cambia el color del icono
+                  ),
+                  title: Text('Pedidos',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  selected: _selectedIndex == 2,
+                  onTap: () {
+                    _onMenuItemSelected(2);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.monetization_on,
+                    color: Colors.grey, // Cambia el color del icono
+                  ),
+                  title: Text('Cobranza',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  selected: _selectedIndex == 3,
+                  onTap: () {
+                    _onMenuItemSelected(3);
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.settings,
@@ -290,40 +351,17 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 0,
+                  selected: _selectedIndex == 3,
                   onTap: () {
-                    _onMenuItemSelected(0);
+                    _onMenuItemSelected(3);
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.checklist),
-                  title: Text('Cliente',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),),
-                  selected: _selectedIndex == 1,
-                  onTap: () {
-                    _onMenuItemSelected(1);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.library_add_check_rounded),
-                  title: Text('Nuevo Correctivo',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                  selected: _selectedIndex == 2,
-                  onTap: () {
-                    _onMenuItemSelected(2);
-                  },
-                ),
+
               ],
             ),
           ),
         ),
+
         body: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: const BoxDecoration(
@@ -333,14 +371,6 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
             )),
             child: ListView(
               children:<Widget> [
-                Center(
-                  child: Text(
-                    'IDENTIFICADOR CLIENTE',
-                    style: TextStyle(
-                      color: Color.fromRGBO(102, 45, 145, 30),
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),),),
                 SizedBox(height: 20),
                 Row(
                   children: [

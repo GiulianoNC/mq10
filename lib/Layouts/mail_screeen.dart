@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mq10/Herramientas/global.dart';
 
 import '../Herramientas/boton.dart';
 import '../Herramientas/variables_globales.dart';
@@ -15,7 +16,7 @@ class mail extends StatefulWidget {
 
 class _mailState extends State<mail> {
   int _selectedIndex = 0;
-  String selectedMail = "sbasilico@quantumconsulting.com.ar"; // Variable para almacenar el valor seleccionado del menú desplegable
+  String selectedMail = ""; // Variable para almacenar el valor seleccionado del menú desplegable
   bool loading = false; // Nuevo estado para controlar la visibilidad del indicador de progreso
   List<String> mailOptions = [""]; // Lista para almacenar las opciones del menú desplegable
 
@@ -24,11 +25,10 @@ class _mailState extends State<mail> {
     super.initState();
     // Cargar las opciones del menú desplegable desde el servicio web aquí
     loadMailOptions();
+    print("esto son los datos "+correoGlobal+razonSocialGlobal +clienteGlobal);
   }
+  // Realizar una solicitud HTTP al servicio web y obtener las opciones de correo
   Future<void> loadMailOptions() async {
-    // Realizar una solicitud HTTP al servicio web y obtener las opciones de correo
-    // Puedes utilizar http package u otro método para hacer la solicitud
-    // Ejemplo ficticio:
     final response = await http.post(
       Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH'),
       headers: <String, String>{
@@ -47,7 +47,7 @@ class _mailState extends State<mail> {
 
     if (response.statusCode == 200) {
        final data = json.decode(response.body);
-       print(data);
+       //print(data);
        final mailData = data['MQ1002BD_DATAREQ']['rowset'] as List<dynamic>;
        final mailOptions = mailData
            .map((mail) => mail['Correo'] as String)
@@ -66,12 +66,13 @@ class _mailState extends State<mail> {
        }
   }
 
+  //menu desplegable
   void _onMenuItemSelected(int index) {
     setState(() {
       _selectedIndex = index;
     });
     Navigator.of(context).pop(); // Cierra el menú lateral
-    // Agrega la lógica para navegar a las pantallas correspondientes aquí
+    // Agrega la lógica para navegar a las pantallas correspondientes aca
     switch (index) {
       case 0:
         Navigator.pushNamed(context, "/congrats");
@@ -91,7 +92,6 @@ class _mailState extends State<mail> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -110,29 +110,61 @@ class _mailState extends State<mail> {
           ),
            )
           ),
-          title: Row(
-              children:[
+          title: Container(
+            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+            child: Column(
+              children: [
+                SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+
+                Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              clienteGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(212, 20, 90, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              razonSocialGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(102, 45, 145, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+              //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
-                  margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
-                  //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  // alignment: Alignment.center,
-                  child: Image.asset("images/nombre.png",
-                    width: 150,
-                    height: 50,
+                  decoration: BoxDecoration(
+                    color: Color.fromRGBO(212, 20, 90, 1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                  child: Text(
+                    correoGlobal,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                    ),
                   ),
                 ),
-                Expanded(child: Container()), // Esto empujará el ícono hacia la derecha
-                Padding(
-                  padding: EdgeInsets.only(top: 10, right: 10), // Ajusta estos valores según tus preferencias
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    color: Colors.grey, // Cambia el color del ícono de flecha
-                  ),
-                ),
-              ]
+              ],
+            ),
           ),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(20.0),
@@ -245,8 +277,6 @@ class _mailState extends State<mail> {
                     _onMenuItemSelected(3);
                   },
                 ),
-
-
 
               ],
             ),

@@ -17,5 +17,19 @@ var  version ="";
 var nroOrdenGlobal = "";
 var nroActivoGlobal = "";
 var respuestaGlobal= "";
+var clienteGlobal= "";
+var correoGlobal= "";
+var razonSocialGlobal= "";
+var tipoPedidoGlobal= "";
+var depositoGlobal= "";
+var rmonedaGlobal= "";
+var cobrarDeudaGlobal= "";
+var totalDeudaGlobal ="";
+
+
+
+
+
+
 
 

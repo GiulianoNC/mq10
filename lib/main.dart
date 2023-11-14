@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:mq10/Layouts/cobranzas/cobrarDeuda_screen.dart';
 import 'Herramientas/SplashScreen.dart';
-import 'Layouts/cobranza_screen.dart';
+import 'Layouts/cobranzas/cobranza_screen.dart';
 import 'Layouts/login_screen.dart';
 import 'Layouts/mail_screeen.dart';
 import 'Layouts/nuevo_cliente.dart';
@@ -32,6 +33,8 @@ class MyApp extends StatelessWidget {
         '/pedidos': ( context) =>  Pedidos(),
         '/cobranza': ( context) =>  Cobranza(),
         '/pedidoNuevo': (BuildContext context) => PedidoNuevo(),
+        '/cobrarDeuda': (BuildContext context) => cobrarDeuda(),
+
 
         /* '/correctivo': ( context) =>  MantenimientoScreen(),
         '/motivo': ( context) =>  motivo(),
