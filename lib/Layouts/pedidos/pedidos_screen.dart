@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import '../Herramientas/global.dart';
-import '../Herramientas/variables_globales.dart';
-import 'pedidoNuevo_screen.dart';
+import 'package:mq10/Layouts/pedidos/pedidoNuevo_screen.dart';
+import '../../Herramientas/global.dart';
+import '../../Herramientas/variables_globales.dart';
 
 
 class Pedidos extends StatefulWidget {
@@ -109,38 +109,43 @@ class _PedidosState extends State<Pedidos> {
                   child: Column(
                     children: [
                       SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 10),
+                                  Text(
+                                    clienteGlobal,
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(212, 20, 90, 1),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    razonSocialGlobal,
+                                    style: TextStyle(
+                                      color: Color.fromRGBO(102, 45, 145, 1),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                  // SizedBox(width: 10),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
 
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              children: [
-                                Text(
-                                  clienteGlobal,
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(212, 20, 90, 1),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                                SizedBox(width: 10),
-                                Text(
-                                  razonSocialGlobal,
-                                  style: TextStyle(
-                                    color: Color.fromRGBO(102, 45, 145, 1),
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
                       ),
                       //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                       Container(
@@ -203,7 +208,8 @@ class _PedidosState extends State<Pedidos> {
                       ),
                       ListTile(
                         leading: Icon(Icons.person),
-                        title: Text('Cliente',
+                        title:
+                        Text('Cliente',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.black,
@@ -309,10 +315,80 @@ class _PedidosState extends State<Pedidos> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text('Fecha de Orden: ${item['Fecha_Orden']}'),
+                                  RichText(
+                                      text: TextSpan(
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Color.fromRGBO(102, 45, 145, 1.0),
+                                        ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'Fecha de Orden: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text:('${item['Fecha_Orden']}'),
+                                            )
+                                          ]
+                                      )
+                                  ),
+                                  RichText(
+                                      text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'Razón Social: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text:('${item['Razon_social']}'),
+                                            )
+                                          ]
+                                      )
+                                  ),
+                                  RichText(
+                                      text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'NRO_ORDEN: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text:('${item['Orden_Nro']}'),
+                                            )
+                                          ]
+                                      )
+                                  ),
+                                  RichText(
+                                      text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'NRO_LINEA: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text:('${item['Linea_Nro']}'),
+                                            )
+                                          ]
+                                      )
+                                  ),
+
+
+                                /*  Text('Fecha de Orden: ${item['Fecha_Orden']}'),
                                   Text('Razón Social: ${item['Razon_social']}'),
                                   Text('NRO_ORDEN: ${item['Orden_Nro']}'),
-                                  Text('NRO_LINEA: ${item['Linea_Nro']}'),
+                                  Text('NRO_LINEA: ${item['Linea_Nro']}'),*/
                                   Checkbox(
                                     value: isSelected,
                                     onChanged: (bool? value) {
@@ -367,13 +443,13 @@ class BottomSheetButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.white,
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            ElevatedButton(
-              onPressed: () {
+      color: Colors.white,
+      height: 80,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ElevatedButton(
+            onPressed: () {
                 // Resto del código del botón "CANCELAR"
                 showDialog(
                   context: context,
@@ -386,7 +462,7 @@ class BottomSheetButtons extends StatelessWidget {
                       actions: <Widget>[
                         if (!isLoading)
                           TextButton(
-                            child: Text('Cancelar'),
+                            child: Text('CANCELAR'),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
@@ -461,20 +537,59 @@ class BottomSheetButtons extends StatelessWidget {
                   },
                 );
               },
-              child: Text('CANCELAR'),
+              child: Text('   CANCELAR    '),
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                    (Set<MaterialState> states) {
+                  if (states.contains(MaterialState.pressed)) {
+                    return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                  }
+                  return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                },
+              ),
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                ),
+              ),
             ),
+
+          ),
             ElevatedButton(
               onPressed: () {
                 // Agrega aquí la lógica para el botón "NUEVO"
                 navigateToIncidenteScreen(context);
               },
-              child: Text('NUEVO'),
+              child: Text('      NUEVO      ',
+              style: TextStyle(
+                color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+              ),),
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                      (Set<MaterialState> states) {
+                    if (states.contains(MaterialState.pressed)) {
+                      return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                    }
+                    return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                  },
+                ),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                    side: BorderSide(
+                      color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                      width: 1.0, // Grosor del borde
+                    ),
+                  ),
+                ),
+              ),
+
             ),
           ],
         ),);
-
   }
 }
+
 
 void navigateToIncidenteScreen(BuildContext context) {
   Navigator.push(context, MaterialPageRoute(builder: (context) => PedidoNuevo()));

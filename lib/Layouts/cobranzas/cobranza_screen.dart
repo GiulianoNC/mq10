@@ -134,38 +134,43 @@ class _CobranzaState extends State<Cobranza> {
           child: Column(
             children: [
               SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          SizedBox(width: 10),
+                          Text(
+                            clienteGlobal,
+                            style: TextStyle(
+                              color: Color.fromRGBO(212, 20, 90, 1),
+                              fontSize: 10,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          Text(
+                            razonSocialGlobal,
+                            style: TextStyle(
+                              color: Color.fromRGBO(102, 45, 145, 1),
+                              fontSize: 10,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          // SizedBox(width: 10),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
 
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          clienteGlobal,
-                          style: TextStyle(
-                            color: Color.fromRGBO(212, 20, 90, 1),
-                            fontSize: 10,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          razonSocialGlobal,
-                          style: TextStyle(
-                            color: Color.fromRGBO(102, 45, 145, 1),
-                            fontSize: 10,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
               ),
               //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
               Container(
@@ -472,16 +477,53 @@ class _CobranzaState extends State<Cobranza> {
                     onPressed: () {
                       Navigator.pushNamed(context, "/cobrarDeuda");
                     },
-                    child: Text('Cobrar deuda'),
+                    child: Text(' COBRAR DEUDA'),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed)) {
+                            return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                          }
+                          return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                        },
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(width: 10),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Lógica para cobrar anticipo
+                      Navigator.pushNamed(context, "/cobrarAnticipo");
+
                     },
-                    child: Text('Cobrar anticipo'),
+                    child: Text(' COBRAR ANTICIPO',
+                      style: TextStyle(
+                        color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                      ),),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed)) {
+                            return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                          }
+                          return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                        },
+                      ),
+                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                          side: BorderSide(
+                            color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                            width: 1.0, // Grosor del borde
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],

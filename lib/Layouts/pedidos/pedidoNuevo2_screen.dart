@@ -4,9 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import '../Herramientas/boton.dart';
-import '../Herramientas/global.dart';
-import '../Herramientas/variables_globales.dart';
+import '../../Herramientas/boton.dart';
+import '../../Herramientas/global.dart';
+import '../../Herramientas/variables_globales.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class PedidoNuevo2 extends StatefulWidget {
@@ -301,42 +301,47 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
               )
           ),
           title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             child: Column(
               children: [
                 SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            Text(
+                              clienteGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(212, 20, 90, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              razonSocialGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(102, 45, 145, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            // SizedBox(width: 10),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
 
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            clienteGlobal,
-                            style: TextStyle(
-                              color: Color.fromRGBO(212, 20, 90, 1),
-                              fontSize: 10,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            razonSocialGlobal,
-                            style: TextStyle(
-                              color: Color.fromRGBO(102, 45, 145, 1),
-                              fontSize: 10,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
                 //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
@@ -475,7 +480,7 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
         ),
           body:
           Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(10.0),
               decoration: const BoxDecoration(
                 image: DecorationImage(
                   image: AssetImage('images/fondogris_solo.png'),
@@ -654,117 +659,140 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                       onPressed: () {
                         // Lógica para continuar
                         _continuar();
+                        setState(() {}); // Redibuja la interfaz después de agregar elementos a listaPedido
                       },
-                      child: Text('Continuar'),
+                      child: Text('  Continuar  '),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                          ),
+                        ),
+                      ),
+
                     ),
                     // Lista de pedidos
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 20.0),
-                      padding: EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Lista desplazable de pedidos
-                          Container(
-                            height: 200, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemCount: listaPedido.length,
-                              itemBuilder: (context, index) {
-                                return Container(
-                                  height: 80,
-                                  child: Row(
-                                    children: [
-                                      Checkbox(
-                                        value: selectedIndices.contains(index),
-                                        onChanged: (bool? value) {
-                                          setState(() {
-                                            if (value != null && value) {
-                                              selectedIndices.add(index);
-                                            }
-                                          });
-                                        },
-                                      ),
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                Container(
+                        margin: EdgeInsets.symmetric(vertical: 20.0),
+                        padding: EdgeInsets.all(16.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        child :SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Lista desplazable de pedidos
+                              Container(
+                                //height: 200, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: NeverScrollableScrollPhysics(),
+                                  itemCount: listaPedido.length,
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                      height: 80,
+                                      child: Row(
                                         children: [
-                                          RichText(
-                                            text: TextSpan(
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Color.fromRGBO(102, 45, 145, 1),
-                                              ),
-                                              children: [
-                                                TextSpan(
-                                                  text: 'CÓDIGO: ',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text: '${listaPedido[index]['CÓDIGO']}',
-                                                ),
-                                              ],
-                                            ),
+                                          Checkbox(
+                                            value: selectedIndices.contains(index),
+                                            onChanged: (bool? value) {
+                                              setState(() {
+                                                if (value != null && value) {
+                                                  selectedIndices.add(index);
+                                                } else {
+                                                  selectedIndices.remove(index);
+                                                }
+                                              });
+                                            },
                                           ),
-                                          RichText(
-                                            text: TextSpan(
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Color.fromRGBO(102, 45, 145, 1),
+                                          Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              RichText(
+                                                text: TextSpan(
+                                                  style: TextStyle(
+                                                    fontSize: 15,
+                                                    color: Color.fromRGBO(102, 45, 145, 1),
+                                                  ),
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'CÓDIGO: ',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '${listaPedido[index]['CÓDIGO']}',
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text: 'PRODUCTO: ',
+                                              RichText(
+                                                text: TextSpan(
                                                   style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                    color: Color.fromRGBO(102, 45, 145, 1),
                                                   ),
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'PRODUCTO: ',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '${listaPedido[index]['PRODUCTO']}',
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                                TextSpan(
-                                                  text: '${listaPedido[index]['PRODUCTO']}',
-                                                  style: TextStyle(
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          RichText(
-                                            text: TextSpan(
-                                              style: TextStyle(
-                                                fontSize: 15,
-                                                color: Color.fromRGBO(102, 45, 145, 1),
                                               ),
-                                              children: [
-                                                TextSpan(
-                                                  text: 'CANTIDAD: ',
+                                              RichText(
+                                                text: TextSpan(
                                                   style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 15,
+                                                    color: Color.fromRGBO(102, 45, 145, 1),
                                                   ),
+                                                  children: [
+                                                    TextSpan(
+                                                      text: 'CANTIDAD: ',
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    TextSpan(
+                                                      text: '${listaPedido[index]['CANTIDAD']}',
+                                                    ),
+                                                  ],
                                                 ),
-                                                TextSpan(
-                                                  text: '${listaPedido[index]['CANTIDAD']}',
-                                                ),
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
-                                );
-                              },
-                            ),
+                                    );
+                                  },
+                                ),
 
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+
+
                     ElevatedButton(
                       onPressed: selectedIndices.isNotEmpty
                           ? () {
@@ -777,17 +805,26 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                               actions: [
                                 TextButton(
                                   onPressed: () {
-                                    _eliminarElementosSeleccionados();
+                                    _realizarPostRequest();
                                     Navigator.of(context).pop();
+                                    setState(() {}); // Redibuja la interfaz después de enviar elementos a listaPedido
+
                                   },
-                                  child: Text('Eliminar'),
+                                  child: Text('Enviar'),
                                 ),
                                 TextButton(
                                   onPressed: () {
-                                    _realizarPostRequest();
                                     Navigator.of(context).pop();
                                   },
-                                  child: Text('Realizar POST request'),
+                                  child: Text('Modificar'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    _eliminarElementosSeleccionados();
+                                    Navigator.of(context).pop();
+                                    setState(() {}); // Redibuja la interfaz después de eliminar elementos a listaPedido
+                                  },
+                                  child: Text('Eliminar'),
                                 ),
                               ],
                             );
@@ -795,7 +832,29 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                         );
                       }
                           : null,
-                      child: Text('SELECCIONAR'),
+                      child: Text('      SELECCIONAR      ',
+                        style: TextStyle(
+                          color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                        ),),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                            side: BorderSide(
+                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                              width: 1.0, // Grosor del borde
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
 
                   ],

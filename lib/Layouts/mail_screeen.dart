@@ -111,21 +111,23 @@ class _mailState extends State<mail> {
            )
           ),
           title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             child: Column(
               children: [
                 SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
-
-                Row(
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
+                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           children: [
+                            SizedBox(width: 10),
                             Text(
                               clienteGlobal,
                               style: TextStyle(
@@ -143,12 +145,15 @@ class _mailState extends State<mail> {
                                 fontWeight: FontWeight.normal,
                               ),
                             ),
+                            // SizedBox(width: 10),
                           ],
                         ),
                       ),
                     ],
                   ),
-              //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+
+                ),
+                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(212, 20, 90, 1),

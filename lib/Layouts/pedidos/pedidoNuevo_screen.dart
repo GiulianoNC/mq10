@@ -4,10 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mq10/Herramientas/global.dart';
-import 'package:mq10/Layouts/pedidoNuevo2_screen.dart';
+import 'package:mq10/Layouts/pedidos/pedidoNuevo2_screen.dart';
 
-import '../Herramientas/boton.dart';
-import '../Herramientas/variables_globales.dart';
+import '../../Herramientas/boton.dart';
+import '../../Herramientas/variables_globales.dart';
 
 
 class PedidoNuevo extends StatefulWidget {
@@ -152,42 +152,47 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
               )
           ),
           title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             child: Column(
               children: [
                 SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          children: [
+                            SizedBox(width: 10),
+                            Text(
+                              clienteGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(212, 20, 90, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Text(
+                              razonSocialGlobal,
+                              style: TextStyle(
+                                color: Color.fromRGBO(102, 45, 145, 1),
+                                fontSize: 10,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                            // SizedBox(width: 10),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
 
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 60),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            clienteGlobal,
-                            style: TextStyle(
-                              color: Color.fromRGBO(212, 20, 90, 1),
-                              fontSize: 10,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            razonSocialGlobal,
-                            style: TextStyle(
-                              color: Color.fromRGBO(102, 45, 145, 1),
-                              fontSize: 10,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
                 ),
                 //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(

@@ -136,7 +136,7 @@ class _PrimeraState extends State<Primera> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Seleccionar Cliente"),
+          title: Text("Razón Social y CUIT"),
           content: Container(
             width: double.minPositive,
             child: ListView(
@@ -168,6 +168,14 @@ class _PrimeraState extends State<Primera> {
         );
       },
     );
+  }
+
+  void initState() {
+    super.initState();
+    if(razonSocialGlobal.isNotEmpty){
+      razonSocialController.text= razonSocialGlobal;
+      cuitController.text= clienteGlobal;
+    }
   }
 
   @override
@@ -365,16 +373,6 @@ class _PrimeraState extends State<Primera> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               SizedBox(height: 25),
-                              /*  Center(
-                              child: Text(
-                                'CUIT',
-                                style: TextStyle(
-                                  color: Color.fromRGBO(102, 45, 145, 30),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),*/
                             ],
                           ),
                           SizedBox(height: 16), // Espacio entre los campos
@@ -416,16 +414,6 @@ class _PrimeraState extends State<Primera> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            /* Center(
-                            child: Text(
-                              'RAZON SOCIAL',
-                              style: TextStyle(
-                                color: Color.fromRGBO(102, 45, 145, 30),
-                                fontSize: 20,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                          ),*/
                             SizedBox(height: 16),
                             Center(
                               child: Container(
@@ -435,21 +423,33 @@ class _PrimeraState extends State<Primera> {
                                   color: Colors.white,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: TextField(
-                                  controller: razonSocialController,
-                                  decoration: InputDecoration(
-                                    hintText: 'Razon Social',
-                                    border: InputBorder.none,
-                                  ),
-                                  onChanged: (value) {
-                                    // Realiza la búsqueda de sugerencias cuando el usuario escribe en el campo
-                                    buscarSugerencias(value);
-                                  },
+                                child: 
+                                Row(
+                                  children: [
+                                    Expanded(
+                                        child:  TextField(
+                                          controller: razonSocialController,
+                                          decoration: InputDecoration(
+                                            hintText: 'Razon Social',
+                                            border: InputBorder.none,
+                                          ),
+                                          onChanged: (value) {
+                                            // Realiza la búsqueda de sugerencias cuando el usuario escribe en el campo
+                                            buscarSugerencias(value);
+                                          },
+                                        ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      onPressed: buscarCliente,
+
+                                    ),
+                                  ],
                                 ),
 
                               ),
                             ),
-                            ElevatedButton(
+                           /* ElevatedButton(
                               onPressed: () {
                                 // Guarda el valor en la variable global al presionar el botón de confirmación
                                 setState(() {
@@ -467,7 +467,7 @@ class _PrimeraState extends State<Primera> {
                                 primary: Colors.green, // Color de fondo del botón de confirmación
                                 shape: CircleBorder(), // Botón redondo
                               ),
-                            ),
+                            ),*/
                             // Mostrar las sugerencias en una lista emergente debajo del TextField
                             if (suggestions.isNotEmpty)
                               Container(
@@ -507,38 +507,78 @@ class _PrimeraState extends State<Primera> {
                       mainAxisAlignment: MainAxisAlignment.center, // Para centrar los botones horizontalmente
                       children: [
                         ElevatedButton(
-                          onPressed: buscarCliente,
-                          child: Text('BUSCAR'),
-                          style: ElevatedButton.styleFrom(
-                            primary: Color.fromRGBO(212, 20, 90, 100), // Cambia RRGGBB al código de color RGB deseado
-                            onPrimary: Colors.white, // Color del texto
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Radio del borde
-                              side: BorderSide(
-                                color:Color.fromRGBO(212, 20, 90, 100), // Color del borde
-                                width: 2.0, // Ancho del borde
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text('Cliente: $razonSocialGlobal'),
+                                  //   content: Text('La operación se realizó con éxito.'),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: Text('Aceptar'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                            // Guarda el valor en la variable global al presionar el botón de confirmación
+                            setState(() {
+                              razonSocialGlobal = razonSocialController.text;
+                              clienteGlobal= cuitController.text ;
+                              if(correoGlobal.isEmpty){
+                                correoGlobal =this.correo ;
+                              }
+                            });
+
+                          },
+                          child: Text('     ACEPTAR    '),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                                }
+                                return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                              },
+                            ),
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0), // Aplica un radio
                               ),
                             ),
-                          ),
-                        ),
+                          ),                        ),
                         SizedBox(width: 16), // Espacio entre los botones
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pushNamed(context, "/nuevoCliente");
                           },
-                          child: Text('NUEVO'),
-                          style: ElevatedButton.styleFrom(
-                            primary:Color.fromRGBO(212, 20, 90, 100),  // Cambia RRGGBB al código de color RGB deseado
-                            onPrimary: Colors.white, // Color del texto
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Radio del borde
-                              side: BorderSide(
-                                color:Color.fromRGBO(212, 20, 90, 100),  // Color del borde
-                                width: 2.0, // Ancho del borde
+                          child: Text('      NUEVO      ',
+                            style: TextStyle(
+                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                            ),),
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                                }
+                                return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                              },
+                            ),
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                                side: BorderSide(
+                                  color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                                  width: 1.0, // Grosor del borde
+                                ),
                               ),
                             ),
-                          ),
-                        ),
+                          ),                        ),
                       ],
                     ),
                   )
@@ -547,12 +587,7 @@ class _PrimeraState extends State<Primera> {
               ),
             ),
           ),
-
-
         ),
-
-
-
         ),
       );
   }

@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../Herramientas/boton.dart';
+import '../Herramientas/global.dart';
 import '../Herramientas/variables_globales.dart';
 
 class ClienteNuevo extends StatefulWidget {
@@ -24,8 +25,90 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
   var telefonoPrefijo ="";
   var telefonoNumero="";
   var correo = "";
+  var _selectedEstado; // Estado seleccionado
+
+  final cuitController = TextEditingController();
+  final razonSocialController = TextEditingController();
+  final direccionController = TextEditingController();
+  final codigoPostalController = TextEditingController();
+  final telefonoPrefijoController = TextEditingController();
+  final telefonoNumeroController = TextEditingController();
+  final correoController = TextEditingController();
+
+  // Lista de estados
+  List<Map<String, String>> _estados = [];
+
 
   List<Map<String, String>> estados = []; // Lista de estados desde la solicitud POST
+
+
+  void _mostrarListaEstados() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Selecciona un estado'),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: estados.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(estados[index]["Estado"] ?? ""),
+                  onTap: () {
+                    setState(() {
+                      _selectedEstado = estados[index]["Estado"];
+                    });
+                    Navigator.of(context).pop();
+                  },
+                );
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  //campo de estado
+  Widget buildEstadoDropdown() {
+    return  Container(
+      margin: EdgeInsets.only(bottom: 10), // Espacio entre los TextField
+      child: Row(
+        children: [
+          Text(
+            'ESTADO     ',
+            style: TextStyle(
+              color: Color.fromRGBO(102, 45, 145, 30),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: TextFormField(
+              controller: TextEditingController(text: _selectedEstado ?? ''),
+              decoration: InputDecoration(
+                hintText: 'Selecciona un estado',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: _mostrarListaEstados, // Función para mostrar la lista de estados
+                  icon: Icon(Icons.arrow_drop_down), // Icono de flecha hacia abajo
+                ),
+              ),
+              readOnly: true,
+            ),
+          ),
+        ],
+      )
+    );
+  }
 
   // Estado seleccionado
   String? estadoValue;
@@ -39,7 +122,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       selectedEstado = newValue;
     });
   }
-//lista desplegable
+
 //lista desplegable
   Future<void> cargarEstados() async {
     final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X5A_ORCH");
@@ -51,7 +134,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     try {
       final response = await http.post(url, headers: headers);
       final data = json.decode(response.body);
-      print(data);
+     // print(data);
 
       if (data.containsKey("MQ10X5A_FORMREQ_1")) {
         final estadosData = data["MQ10X5A_FORMREQ_1"];
@@ -78,10 +161,16 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       print("Error en la solicitud POST: $e");
     }
   }
+
   //cargar nuevo cliente y se valida los datos obligatorios
-  Future<void> buscarCliente() async {
+  Future<void> generarCliente() async {
     // Validación de campos obligatorios
-    if (cuit.isEmpty || razonSocial.isEmpty) {
+    var cuitValue = cuitController.text; // Reemplaza cuitController con el controlador correcto
+    var razonSocialValue = razonSocialController.text; // Reemplaza razonSocialController con el controlador correcto
+
+    print(cuitValue + razonSocialValue);
+
+  /*  if (cuitValue.length==0 || razonSocialValue.length == 0) {
       showDialog(
         context: context,
         builder: (context) {
@@ -99,13 +188,32 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
           );
         },
       );
-      return;
-    }
+      //return;
+    }else{
+
+    }*/
 
     final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH");
     final body = jsonEncode({
-      "RAZON SOCIAL": razonSocial,
-      "TAX_ID": cuit,
+      "username" : "sbasilico",
+      "password" : "Silvio71",
+      "Razon_Social": razonSocial,
+      "Tax_ID": cuit,
+      "Direccion1": direccion,
+      "Estado": estado,
+      "Codig_Postal": codigoPostal,
+      "Zona_Venta": "741",
+      "Tipo_NroLegal": "080",
+      "Clase_Contable": "NAC",
+      "Explicacion_Fiscal": "V",
+      "Area_Fiscal": "ARIVA21",
+      "Busqueda": "C",
+      "Correo" : correo,
+      "Telefono_Prefijo": telefonoPrefijo,
+      "Telefono_Numero": telefonoNumero,
+      "InstruccionEntrega1": "Preguntar por Adrian",
+      "InstruccionEntrega2": "Despues del mediodia",
+      "Programa_Ajuste": "PCR"
     });
 
     final headers = {
@@ -116,13 +224,30 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     try {
       final response = await http.post(url, body: body, headers: headers);
       final data = json.decode(response.body);
-      var resp = json.decode(response.body).toString();
-      print("restuesta es: "+ resp );
+      //AGREGAR A GLOBALES
+      razonSocialGlobal = razonSocialController.text;
+      clienteGlobal = cuitController.text;
+      correoGlobal = correoController.text;
 
       if (response.statusCode == 200) {
-        cliente = data["Cliente"];
-        cuit = data["Tax_ID"];
-        razonSocial = data["Razon_Social"];
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('CLIENTE AGREGADO'),
+              //   content: Text('La operación se realizó con éxito.'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Aceptar'),
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/congrats");
+                    //Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
         setState(() {});
       } else {
         print("Error en la solicitud POST: ${response.statusCode}");
@@ -194,17 +319,10 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     super.initState();
     cargarEstados();
     estadoValue = estados.isNotEmpty ? estados[0]["Estado"] : null;
-
   }
 
   @override
   Widget build(BuildContext context) {
-    List<DropdownMenuItem<String>> estadosDropdownItems = estados.map((estado) {
-      return DropdownMenuItem<String>(
-        value: estado["Estado"],
-        child: Text(estado["Estado"]!),
-      );
-    }).toList();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -361,7 +479,6 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
             ),
           ),
         ),
-
         body: Container(
           padding: const EdgeInsets.all(16.0),
           decoration: const BoxDecoration(
@@ -378,14 +495,14 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          buildTextField("CUIT           ", "CUIT", cuit),
-                          buildTextField("RAZÓN       \nSOCIAL", "RAZÓN SOCIAL", razonSocial),
-                          buildTextField("DIRECCIÓN", "DIRECCIÓN", direccion),
-                          buildDropdown("ESTADO", estados, selectedEstado),
-                          buildTextField("CÓDIGO      \nPOSTAL", "CÓDIGO POSTAL", codigoPostal),
-                          buildTextField("TÉLEFONO \nPÉFIJO", "TÉLEFONO PÉFIJO", telefonoPrefijo),
-                          buildTextField("TÉLEFONO \nNÚMERO", "TÉLEFONO NÚMERO", telefonoNumero),
-                          buildTextField("MAIL           ", "CORREO", correo),
+                          buildTextField("CUIT           ", "CUIT", cuitController ),
+                          buildTextField("RAZÓN       \nSOCIAL", "RAZÓN SOCIAL", razonSocialController ),
+                          buildTextField("DIRECCIÓN", "DIRECCIÓN", direccionController ),
+                          buildEstadoDropdown(), // Campo de texto para el estado
+                          buildTextField("CÓDIGO      \nPOSTAL", "CÓDIGO POSTAL", codigoPostalController ),
+                          buildTextField("TÉLEFONO \nPÉFIJO", "TÉLEFONO PÉFIJO", telefonoPrefijoController ),
+                          buildTextField("TÉLEFONO \nNÚMERO", "TÉLEFONO NÚMERO", telefonoNumeroController ),
+                          buildTextField("MAIL           ", "CORREO", correoController ),
                         ],
                       ),
                     ),
@@ -399,7 +516,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                     SizedBox(width: 15), // Espacio de 15 píxeles entre los botones
                     Expanded(
                       child: MyElevatedButton(
-                        onPressed: buscarCliente,
+                        onPressed: generarCliente,
                         child: Text('CONFIRMAR'),
                       ),
                     ),
@@ -414,9 +531,11 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
         );
   }
 }
-Widget buildTextField(String label, String hint, String value) {
+
+//campos configuracion
+Widget buildTextField(String label, String hint, TextEditingController controller) {
   return Container(
-    margin: EdgeInsets.only(bottom: 10), // Espacio entre los TextField
+    margin: EdgeInsets.only(bottom: 10),
     child: Row(
       children: [
         Text(
@@ -430,17 +549,18 @@ Widget buildTextField(String label, String hint, String value) {
         SizedBox(width: 10),
         Expanded(
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               hintText: hint,
-              filled: true, // Rellena el fondo del TextField
-              fillColor: Colors.white, // Fondo blanco
+              filled: true,
+              fillColor: Colors.white,
               border: OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 2.0), // Bordes blancos
-                borderRadius: BorderRadius.circular(10.0), // Radio de los bordes
+                borderSide: BorderSide(color: Colors.white, width: 2.0),
+                borderRadius: BorderRadius.circular(10.0),
               ),
             ),
             onChanged: (value) {
-              // Puedes manejar el valor aquí
+              // Puedes manejar el valor aquí si es necesario
             },
           ),
         ),
@@ -448,9 +568,6 @@ Widget buildTextField(String label, String hint, String value) {
     ),
   );
 }
-
-
-
 
 class CustomDropdownDialog<T> extends StatefulWidget {
   final List<DropdownMenuItem<T>> items;

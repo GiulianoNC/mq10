@@ -6,14 +6,14 @@ import 'package:mq10/Herramientas/variables_globales.dart';
 
 import '../../Herramientas/global.dart';
 
-class cobrarDeuda extends StatefulWidget {
-  const cobrarDeuda({Key? key}) : super(key: key);
+class cobrarAnticipo extends StatefulWidget {
+  const cobrarAnticipo({Key? key}) : super(key: key);
 
   @override
-  State<cobrarDeuda> createState() => _cobrarDeudaState();
+  State<cobrarAnticipo> createState() => _cobrarAnticipoState();
 }
 
-class _cobrarDeudaState extends State<cobrarDeuda> {
+class _cobrarAnticipoState extends State<cobrarAnticipo> {
   int _selectedIndex = 0;
   var importeCobrar = totalDeudaGlobal;
   var  moneda = "";
@@ -413,60 +413,60 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
           ),
         ),
         body: Container(
-          padding: const EdgeInsets.all(16.0),
-          decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('images/fondogris_solo.png'),
-                fit: BoxFit.cover,
-              )),
-          child:ListView(
-            children:<Widget> [
-              SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        buildTextField("IMPORTE           \n A COBRAR ", "IMPORTE A COBRAR", importeController),
-                        buildTextField("MONEDA            ", "MONEDA", monedaController),
-                        buildDateField("FECHA                ", fechaController),
-                        buildTextField("INSTRUMENTO \n DE PAGO           ",
-                          "INSTRUMENTO DE PAGO",
-                          instrumendoPagoController,
-                              () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return buildPopupDialog(context, "Instrumento de Pago");
-                              },
-                            );
-                          },
-                        ),
-                        buildTextField("BANCO               ",
-                          "BANCO",
-                          bancoController,
-                              () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return buildPopupDialog(context, "Banco");
-                              },
-                            );
-                          },
-                        ),
-                        //   buildTextField("INSTRUMENTO \n DE PAGO           ", "INSTRUMENTO DE PAGO", instrumendoPagoController),
-                      //  buildTextField("BANCO           ", "BANCO", bancoController),
-                        buildTextField("NÚMERO           \n VALOR           ", "NÚMERO VALOR", numeroValorController),
+            padding: const EdgeInsets.all(16.0),
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('images/fondogris_solo.png'),
+                  fit: BoxFit.cover,
+                )),
+            child:ListView(
+              children:<Widget> [
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          buildTextField("IMPORTE           \n A COBRAR ", "IMPORTE A COBRAR", importeController),
+                          buildTextField("MONEDA            ", "MONEDA", monedaController),
+                          buildDateField("FECHA                ", fechaController),
+                          buildTextField("INSTRUMENTO \n DE PAGO           ",
+                            "INSTRUMENTO DE PAGO",
+                            instrumendoPagoController,
+                                () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return buildPopupDialog(context, "Instrumento de Pago");
+                                },
+                              );
+                            },
+                          ),
+                          buildTextField("BANCO               ",
+                            "BANCO",
+                            bancoController,
+                                () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return buildPopupDialog(context, "Banco");
+                                },
+                              );
+                            },
+                          ),
+                          //   buildTextField("INSTRUMENTO \n DE PAGO           ", "INSTRUMENTO DE PAGO", instrumendoPagoController),
+                          //  buildTextField("BANCO           ", "BANCO", bancoController),
+                          buildTextField("NÚMERO           \n VALOR           ", "NÚMERO VALOR", numeroValorController),
 
-                      ],
-                    ),
-                  )
-                ],
-              )
+                        ],
+                      ),
+                    )
+                  ],
+                )
 
-            ],
-          )
+              ],
+            )
         ),
         bottomSheet: Container(
           padding: EdgeInsets.all(20.0),
