@@ -19,6 +19,7 @@ class _mailState extends State<mail> {
   String selectedMail = ""; // Variable para almacenar el valor seleccionado del menú desplegable
   bool loading = false; // Nuevo estado para controlar la visibilidad del indicador de progreso
   List<String> mailOptions = [""]; // Lista para almacenar las opciones del menú desplegable
+  var baseUrl = direc;
 
   @override
   void initState() {
@@ -29,15 +30,15 @@ class _mailState extends State<mail> {
   }
   // Realizar una solicitud HTTP al servicio web y obtener las opciones de correo
   Future<void> loadMailOptions() async {
-    final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH'),
+
+    final response = await http.post(Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1002B_ORCH"),
       headers: <String, String>{
         "Authorization": autorizacionGlobal,
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "username" : "sbasilico",
-        "password" : "Silvio71",
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
         "Cliente": "",
         "Correo":""
       }

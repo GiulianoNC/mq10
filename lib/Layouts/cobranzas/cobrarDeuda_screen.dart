@@ -15,7 +15,7 @@ class cobrarDeuda extends StatefulWidget {
 
 class _cobrarDeudaState extends State<cobrarDeuda> {
   int _selectedIndex = 0;
-  var importeCobrar = totalDeudaGlobal;
+  var importeCobrar = totalDeudaGlobales;
   var  moneda = "";
   var fecha = "";
   var instrumendoPago = "";
@@ -27,6 +27,9 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
   late TextEditingController instrumendoPagoController;
   late TextEditingController bancoController;
   late TextEditingController numeroValorController;
+
+  var baseUrl = direc;
+
   //menu
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -57,13 +60,15 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
   //pop up de instrumento de pago
   Future<List<String>> fetchInstrumentosDePago() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X7A_ORCH'),
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X7A_ORCH"),
+
+      //Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X7A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71"
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
       }),
     );
 
@@ -81,15 +86,18 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
   //pop up de banco
   Future<List<String>> fetchBancos() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X6A_ORCH"),
+
+      // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71"
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
       }),
     );
+
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
@@ -129,9 +137,14 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                   return ListTile(
                     title: Text(snapshot.data![index]),
                     onTap: () {
-                      // Aquí puedes establecer el valor seleccionado en el controlador respectivo
+                      if (title == "Instrumento de Pago") {
+                        instrumendoPagoController.text = snapshot.data![index];
+                      } else {
+                        bancoController.text = snapshot.data![index];
+                      }
                       Navigator.of(context).pop();
                     },
+
                   );
                 },
               ),
@@ -141,10 +154,11 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
-    importeController = TextEditingController(text: totalDeudaGlobal);
+    importeController = TextEditingController(text: totalDeudaGlobales);
     monedaController = TextEditingController(text: monedaGlobal);
     fechaController = TextEditingController(text: _getCurrentDate());
     instrumendoPagoController = TextEditingController();
@@ -155,7 +169,7 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
   //TENER LA FECHA ACTUAL E INSERTARLA
   String _getCurrentDate() {
     DateTime now = DateTime.now();
-    String formattedDate = '${now.year}-${_formatDateValue(now.month)}-${_formatDateValue(now.day)}';
+    String formattedDate = '${_formatDateValue(now.day)}-${_formatDateValue(now.month)}-${now.year}';
     return formattedDate;
   }
 
@@ -216,6 +230,7 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -469,7 +484,7 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
           )
         ),
         bottomSheet: Container(
-          padding: EdgeInsets.all(20.0),
+          height: 60, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -477,12 +492,101 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        var url =  Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1005C_ORCH");
+                      //  var url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1005C_ORCH');
+
+                        var requestBody = jsonEncode({
+                          "username" : usuarioGlobal,
+                          "password" : contraGlobal,
+                          "Compania": companiaGlobal,
+                          "Pagador": clienteGlobal,
+                          "Moneda": monedaGlobal,
+                          "Fecha": "12/10/2023",
+                          //"Fecha": fechaController.text, // Obtener la fecha del controlador
+                          "NroValor": numeroValorController.text,
+                          "InstrumentoPago": "4",
+                          //"InstrumentoPago": instrumendoPagoController.text,
+                          "Importe_valor": importeController.text,
+                        "Banco_valor": "999"
+                       // "Banco_valor": bancoController.text,
+                        });
+
+                        var response = await http.post(
+                          url,
+                          headers: <String, String>{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                          },
+                          body: requestBody,
+                        );
+
+                        if (response.statusCode == 200) {
+                          var jsonResponse = jsonDecode(response.body);
+                          var nroRecibo = jsonResponse['NroRecibo'];
+                          var jdeStatus = jsonResponse['jde__status'];
+
+                          // Aquí puedes manejar la respuesta como desees, por ejemplo, mostrar un mensaje
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('APROBADO'),
+                                  content: Text('NroRecibo: $nroRecibo, jde__status: $jdeStatus.'),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                          print('NroRecibo: $nroRecibo, jde__status: $jdeStatus');
+                        } else {
+                          // En caso de error en la solicitud
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('ERROR'),
+                               //   content: Text('NroRecibo: $nroRecibo, jde__status: $jdeStatus.'),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                          print('Request failed with status: ${response.statusCode}.');
+                        }
                       },
-                      child: Text('CONFIRMAR'),
-                    ),
+
+                      child: Text(' CONFIRMAR',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                          ),
+                        ),
+                      ),                    ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -490,9 +594,34 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                       onPressed: () {
                         // Lógica para cobrar anticipo
                       },
-                      child: Text('CANCELAR'),
-                    ),
+                      child: Text('  CANCELAR',
+                        style: TextStyle(
+                          color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                          fontSize: 12,
+                        ),
+
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                            side: BorderSide(
+                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                              width: 1.0, // Grosor del borde
+                            ),
+                          ),
+                        ),
+                      ),                    ),
                   ),
+                  SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                 ],
               ),
             ],
@@ -505,6 +634,7 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
 Widget buildTextField(String label, String hint, TextEditingController? controller, [VoidCallback? onTap]) {
   Color backgroundColor;
   Color textColor;
+  bool readOnlyField = false;
 
   if (label == "IMPORTE           \n A COBRAR ") {
     backgroundColor = Color.fromRGBO(212, 20, 90, 1); // Fondo personalizado
@@ -534,6 +664,7 @@ Widget buildTextField(String label, String hint, TextEditingController? controll
           child: TextField(
             controller: controller,
             onTap: onTap,
+            readOnly: readOnlyField, // Hace que el campo de texto sea de solo lectura
             decoration: InputDecoration(
               hintText: hint,
               filled: true,

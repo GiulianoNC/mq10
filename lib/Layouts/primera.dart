@@ -18,10 +18,11 @@ class Primera extends StatefulWidget {
 
 class _PrimeraState extends State<Primera> {
   int _selectedIndex = 0;
-  String razonSocial = "";
-  String cuit = "";
-  String cliente = "";
-  String correo = "";
+  var razonSocial = "";
+  var cuit = "";
+  var cliente = "";
+  var correo = "";
+  var baseUrl = direc;
 
   // Nuevo estado para controlar la visibilidad del indicador de progreso
   bool loading = false;
@@ -34,8 +35,9 @@ class _PrimeraState extends State<Primera> {
   // Función para buscar sugerencias de RAZON SOCIAL
   Future<void> buscarSugerencias(String query) async {
 
+    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
 
-    final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH");
+    final url = Uri.parse(baseUrl + api);
     final body = jsonEncode({
       "RAZON_SOCIAL": query,
       "TAX_ID": "",
@@ -96,11 +98,11 @@ class _PrimeraState extends State<Primera> {
   Future<void> buscarCliente() async {
     razonSocialController.text = "";
     cuitController.text = "";
-
+    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
     razonSocial = razonSocialController.text; // Actualiza razonSocial con el valor del controlador
     cuit = cuitController.text; // Actualiza cuit con el valor del controlador
 
-    final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH");
+    var url = Uri.parse(baseUrl + api);
     final body = jsonEncode({
       "RAZON SOCIAL": razonSocial,
       "TAX_ID": cuit,
@@ -528,7 +530,7 @@ class _PrimeraState extends State<Primera> {
                             // Guarda el valor en la variable global al presionar el botón de confirmación
                             setState(() {
                               razonSocialGlobal = razonSocialController.text;
-                              clienteGlobal= cuitController.text ;
+                              cuitGlobal= cuitController.text ;
                               if(correoGlobal.isEmpty){
                                 correoGlobal =this.correo ;
                               }

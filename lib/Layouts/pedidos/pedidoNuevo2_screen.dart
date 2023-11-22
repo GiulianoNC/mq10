@@ -23,6 +23,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
   String _dropdownValue = 'Selecciona una opción'; // Valor predeterminado
   List<Map<String, String>> listaPedido = [];
 
+  var baseUrl = direc;
+
   // Lista para almacenar los índices de elementos seleccionados
   List<int> selectedIndices = [];
 
@@ -151,7 +153,9 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
 
   //busca producto y lo pone en un menudesplegable
   Future<List<String>> fetchDropdownItems() async {
-    final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X2A_ORCH');
+    final url =  Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X2A_ORCH");
+
+    //final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X2A_ORCH');
 
     final response = await http.post(
       url,
@@ -159,8 +163,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71",
+    "username" : usuarioGlobal,
+    "password" : contraGlobal
       }),
     );
 
@@ -234,7 +238,6 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
     }
   }
 
-
   // Método para eliminar elementos seleccionados
   void _eliminarElementosSeleccionados() {
     // Eliminar elementos de listaPedido basado en selectedIndices
@@ -257,29 +260,63 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
         .toList();
 
     // Realizar el POST request
-    final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1009A_ORCH');
+    final url =  Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1009A_ORCH");
+   // final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1009A_ORCH');
     final response = await http.post(
       url,
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71",
-        "Deposito": "11CAD",
-        "Cliente": "64979",
-        "Moneda": "ARS",
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
+        "Deposito":depositoGlobal,
+        "Cliente": clienteGlobal,
+        "Moneda": monedaGlobal,
         "Grilla": grilla,
-        "P4210_Version": "MQ10001"
+        "P4210_Version": tipoPedidoGlobal
       }),
     );
 
     if (response.statusCode == 200) {
       print("ok");
       // Manejar la respuesta exitosa aquí
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('Enviado'),
+           //   content: Text('Por favor, complete los campos CUIT y Razón Social.'),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
     } else {
       // Manejar errores
+      showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text('ERROR'),
+                 content: Text('Por favor, chequear los datos insertados y/o configuración.'),
+              actions: <Widget>[
+                ElevatedButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
       print("NO");
+      print(depositoGlobal);
     }
   }
 
@@ -443,10 +480,10 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.settings,
+                  leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text('Cobranza',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -457,12 +494,11 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                     _onMenuItemSelected(3);
                   },
                 ),
-
                 ListTile(
-                  leading: Icon(Icons.monetization_on,
+                  leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text('Configuración',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -535,7 +571,7 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            TextSpan(text: '${depositoGlobal}'),
+                            TextSpan(text: '${depositoPedidoGlobal}'),
                           ],
                         ),
                       ),

@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.quantum.mq10">
-   <application
-        android:label="mq10"
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:label="Venta Directa"
        android:name="androidx.multidex.MultiDexApplication"
        android:icon="@mipmap/ic_launcher">
         <activity

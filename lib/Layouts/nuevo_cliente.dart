@@ -34,6 +34,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
   final telefonoPrefijoController = TextEditingController();
   final telefonoNumeroController = TextEditingController();
   final correoController = TextEditingController();
+  var baseUrl = direc;
 
   // Lista de estados
   List<Map<String, String>> _estados = [];
@@ -125,7 +126,10 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
 
 //lista desplegable
   Future<void> cargarEstados() async {
-    final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X5A_ORCH");
+
+    late var api = "/jderest/v3/orchestrator/MQ10X5A_ORCH";
+
+    var url = Uri.parse(baseUrl + api);
     final headers = {
       "Authorization": autorizacionGlobal,
       'Content-Type': 'application/json',
@@ -167,6 +171,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     // Validación de campos obligatorios
     var cuitValue = cuitController.text; // Reemplaza cuitController con el controlador correcto
     var razonSocialValue = razonSocialController.text; // Reemplaza razonSocialController con el controlador correcto
+    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
 
     print(cuitValue + razonSocialValue);
 
@@ -193,10 +198,10 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
 
     }*/
 
-    final url = Uri.parse("http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH");
+    var url = Uri.parse(baseUrl + api);
     final body = jsonEncode({
-      "username" : "sbasilico",
-      "password" : "Silvio71",
+      "username" :usuarioGlobal,
+      "password" : contraGlobal,
       "Razon_Social": razonSocial,
       "Tax_ID": cuit,
       "Direccion1": direccion,

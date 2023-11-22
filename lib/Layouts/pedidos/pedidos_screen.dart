@@ -21,20 +21,24 @@ class _PedidosState extends State<Pedidos> {
   //para seleccionar elementos
   Set<int> selectedItems = Set<int>();
   List<dynamic> items = [];
+  var baseUrl = direc;
 
   //pedidos pendientes
   Future<Map<String, dynamic>> fetchData() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1008A_ORCH'),
+   Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1008A_ORCH"),
+       // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1008A_ORCH'),
       headers: <String, String>{
         "Authorization": autorizacionGlobal,
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71",
-        "Deposito": "11CAD",
-        "Cliente": "64979",
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
+        //"Deposito": "11CAD",
+        "Deposito": depositoGlobal,
+        "Cliente": clienteGlobal,
+        //"Cliente": "64979",
         "P4210_Version": "MQ10100",
       }),
     );
@@ -402,6 +406,8 @@ class _PedidosState extends State<Pedidos> {
                                         }
                                       });
                                     },
+                                    activeColor: Colors.deepPurple,
+                                    checkColor: Colors.white,
                                   )
                                 ],
                               ),
@@ -462,13 +468,13 @@ class BottomSheetButtons extends StatelessWidget {
                       actions: <Widget>[
                         if (!isLoading)
                           TextButton(
-                            child: Text('CANCELAR'),
+                            child: Text('NO'),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                           ),
                         TextButton(
-                          child: Text('Aceptar'),
+                          child: Text('SI'),
                           onPressed: () async {
                             // Agrega este print para verificar selectedItems antes de la lógica de cancelación
                             print("selectedItems before cancellation: $selectedItems");

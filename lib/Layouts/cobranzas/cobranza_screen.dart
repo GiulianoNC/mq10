@@ -16,46 +16,74 @@ class Cobranza extends StatefulWidget {
 class _CobranzaState extends State<Cobranza> {
   int _selectedIndex = 3; // Inicializado para que se muestre Cobranza en el Drawer
   late Future<List<Map<String, dynamic>>> _futureData;
-  List<bool> checkedStates = []; // Nuevo estado para almacenar el estado de los checkboxes
+  late List<bool> checkedStates;
+  List<Map<String, dynamic>> selectedItems = []; // Lista de elementos seleccionados
+  Key _listKey = GlobalKey(); // Agrega una Key para el ListView
+  Set<int> selectedItem = Set<int>();//para seleccionar elementos
+  bool mostrarLocal = true;
 
+  var baseUrl = direc;
+
+
+  // Método para verificar si un elemento está en la lista de seleccionados
   bool containsMap(Map<String, dynamic> mapToCheck) {
     return selectedItems.any((item) =>
     item['Local_bruto'] == mapToCheck['Local_bruto'] &&
         item['Local_Pendiente'] == mapToCheck['Local_Pendiente']);
   }
-
   @override
   void initState() {
     super.initState();
     _futureData = fetchData();
+    print(monedaGlobal);
   }
 
   Future<List<Map<String, dynamic>>> fetchData() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1006A_ORCH'),
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1006A_ORCH"),
+      //Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1006A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "silvio71",
-        "Cliente": "64979",
-        "Moneda": "ARS",
-        "Cia": "00028"
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
+        "Cliente":clienteGlobal,
+        "Moneda": monedaGlobal,
+        "Cia": companiaGlobal,
       }),
     );
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<Map<String, dynamic>> rowsetData = data['MQ1006A_DATAREQ']['rowset'].cast<Map<String, dynamic>>();
-      print ("esta son los datos$rowsetData");
 
-      return rowsetData;
+      return rowsetData.map((map) {
+        final String monedaRespuesta = map['Moneda'] ?? '';
+
+        final bool mostrarLocal = monedaGlobal == monedaRespuesta;
+
+        final filteredData = mostrarLocal
+            ? {
+          'Local_bruto': map['Local_bruto'],
+          'Local_Pendiente': map['Local_Pendiente'],
+        }
+            : {
+          'Foraneo_Bruto': map['Foraneo_Bruto'],
+          'Foraneo_Pendiente': map['Foraneo_Pendiente'],
+        };
+
+        return {
+          'Comprobante': map['Comprobante'] ?? '',
+          'Doc_Tipo': map['Doc_Tipo'] ?? '',
+          'Doc_Numero': map['Doc_Numero'] ?? '',
+          ...filteredData,
+        };
+      }).toList();
     } else {
       throw Exception('Failed to load data');
     }
   }
-
   //menu desplegable
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -82,36 +110,32 @@ class _CobranzaState extends State<Cobranza> {
     }
   }
 
-  List<Map<String, dynamic>> selectedItems = []; // Mueve la definición de selectedItems al inicio de la clase
+ // List<Map<String, dynamic>> selectedItems = []; // Mueve la definición de selectedItems al inicio de la clase
   List<Map<String, dynamic>> data = []; // Agregar este para almacenar los datos recibidos
 
 
   // Método para manejar los cambios en los CheckBoxes
+  int totalDeudaGlobal = 0;
 // Actualiza la función updateSelectedItem
   void updateSelectedItem(int index, bool selected) {
-    final selectedLocalBruto = data[index]['Local_bruto'];
     final selectedLocalPendiente = data[index]['Local_Pendiente'];
+    final int parsedLocalPendiente = selectedLocalPendiente;
 
     setState(() {
-      final currentMap = {
-        'Local_bruto': selectedLocalBruto,
-        'Local_Pendiente': selectedLocalPendiente,
-      };
-
       if (selected) {
-        if (!containsMap(currentMap)) {
-          selectedItems.add(currentMap);
-          totalDeudaGlobal = selectedLocalBruto.toString();
-          print("deuda es : "+totalDeudaGlobal);
-        }
+        selectedItem.add(index);
+        totalDeudaGlobal += parsedLocalPendiente;
+        totalDeudaGlobales = totalDeudaGlobal.toString();
+        print("Total deuda global: $totalDeudaGlobal");
       } else {
-        selectedItems.removeWhere((item) =>
-        item['Local_bruto'] == selectedLocalBruto &&
-            item['Local_Pendiente'] == selectedLocalPendiente);
-        // Resto de tu lógica
+        selectedItem.remove(index);
+        totalDeudaGlobal -= parsedLocalPendiente;
+        totalDeudaGlobales = totalDeudaGlobal.toString();
+        print("Total deuda global: $totalDeudaGlobal");
       }
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -308,163 +332,220 @@ class _CobranzaState extends State<Cobranza> {
         ),
       ),
       body:
-          Container(
-            decoration:BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('images/fondogris_solo.png'),
-                  fit: BoxFit.cover, // Ajusta la imagen para cubrir todo el contenedor
-                ),
-          ),
-      child:
-      FutureBuilder<List<Map<String, dynamic>>>(
-        future: _futureData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else {
-            data = snapshot.data ?? []; // Almacena los datos recibidos
-
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white,
-                            //CONDICION PARA EL FONDO DEPENDIENDO DE LO QUE DÉ Doc_tipo
-                            backgroundColor: snapshot.data![index]['Doc_Tipo'] == 'FA'
-                            //si es igual a FA
-                                ? Color.fromRGBO(102, 45, 145, 1.0)
-                            //SI ES DISTINTO A FA
-                                : Color.fromRGBO(212, 20, 90, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: '${snapshot.data![index]['Doc_Tipo']}',
-                            ),
-                            TextSpan(
-                              text: ' ${snapshot.data![index]['Comprobante']}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color.fromRGBO(102, 45, 145, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'CÓDIGO: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: '${snapshot.data![index]['Doc_Numero']}',
-                              //style: TextStyle(color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color.fromRGBO(102, 45, 145, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'TOTAL: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: '${snapshot.data![index]['Local_bruto']}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color.fromRGBO(102, 45, 145, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'PENDIENTE: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: '${snapshot.data![index]['Local_Pendiente']}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color.fromRGBO(102, 45, 145, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'TOTAL FORANEO: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: '${snapshot.data![index]['Foraneo_Bruto']}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      RichText(
-                        text: TextSpan(
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Color.fromRGBO(102, 45, 145, 1.0),
-                          ),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'PENDIENTE FORANEO: ',
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(
-                              text: '${snapshot.data![index]['Foraneo_Pendiente']}',
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+      Padding(
+        padding: EdgeInsets.only(bottom: 90.0), // Ajusta este valor según necesites más o menos espacio para el BottomSheet
+        child:      Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children:[
+              Expanded(
+                child: Container(
+                  decoration:BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('images/fondogris_solo.png'),
+                      fit: BoxFit.cover, // Ajusta la imagen para cubrir todo el contenedor
+                    ),
                   ),
-                  trailing:
-                  Checkbox(
-                    value: containsMap({
-                      'Local_bruto': snapshot.data![index]['Local_bruto'],
-                      'Local_Pendiente': snapshot.data![index]['Local_Pendiente'],
-                    }),
-                    onChanged: (bool? value) {
-                      setState(() {
-                        updateSelectedItem(index, value ?? false);
-                      });
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                    future: _futureData,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else {
+                        data = snapshot.data ?? []; // Almacena los datos recibidos
+                        checkedStates = List<bool>.filled(data.length, false); // Inicializa los estados de los checkboxes
+
+
+                        return ListView.builder(
+                          key: _listKey, // Asigna la Key al ListView
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            final isSelected = selectedItem.contains(index);
+
+                            return Padding(
+                                padding: const EdgeInsets.only(bottom: 15.0),
+                                child:  ListTile(
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Colors.white,
+                                            //CONDICION PARA EL FONDO DEPENDIENDO DE LO QUE DÉ Doc_tipo
+                                            backgroundColor: snapshot.data![index]['Doc_Tipo'] == 'FA'
+                                            //si es igual a FA
+                                                ? Color.fromRGBO(102, 45, 145, 1.0)
+                                            //SI ES DISTINTO A FA
+                                                : Color.fromRGBO(212, 20, 90, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: '${snapshot.data![index]['Doc_Tipo']}',
+                                            ),
+                                            TextSpan(
+                                              text: ' ${snapshot.data![index]['Comprobante']}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'CÓDIGO: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: '${snapshot.data![index]['Doc_Numero']}',
+                                              //style: TextStyle(color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'TOTAL: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: mostrarLocal ? ' ' : 'TOTAL FORANEO: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: mostrarLocal
+                                                  ? '${snapshot.data![index]['Local_bruto']}'
+                                                  : '${snapshot.data![index]['Foraneo_Bruto']}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'PENDIENTE: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: mostrarLocal ? ' ' : 'PENDIENTE FORANEO: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: mostrarLocal
+                                                  ? '${snapshot.data![index]['Local_Pendiente']}'
+                                                  : '${snapshot.data![index]['Foraneo_Pendiente']}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                /*      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'TOTAL FORANEO: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: '${snapshot.data![index]['Foraneo_Bruto']}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      RichText(
+                                        text: TextSpan(
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            color: Color.fromRGBO(102, 45, 145, 1.0),
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: 'PENDIENTE FORANEO: ',
+                                              style: TextStyle(fontWeight: FontWeight.bold),
+                                            ),
+                                            TextSpan(
+                                              text: '${snapshot.data![index]['Foraneo_Pendiente']}',
+                                            ),
+                                          ],
+                                        ),
+                                      ),*/
+                                    ],
+                                  ),
+                                  trailing:
+                                  Checkbox(
+                                    value: isSelected,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        if (value != null) {
+                                          updateSelectedItem(index, value); // Asegúrate de llamar a updateSelectedItem aquí
+                                          print('Checkbox value changed: $value'); // Agrega este print statement
+
+                                          if (value) {
+                                            selectedItem.add(index);
+                                          } else {
+                                            selectedItem.remove(index);
+                                          }
+                                        }
+                                      });
+                                    },
+                                    activeColor: Colors.deepPurple,
+                                    checkColor: Colors.white,
+                                  )
+                               /*   Checkbox(
+                                    value: checkedStates[index], // Asigna el valor de checkedStates al checkbox
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        checkedStates[index] = value ?? false;
+                                        print('Checked state at index $index: ${checkedStates[index]}'); // Agrega este print statement
+                                        updateSelectedItem(index, value ?? false); // Agrega esta línea para actualizar los elementos seleccionados
+
+                                      });
+                                      setState(() {
+                                        _listKey = GlobalKey(); // Crea una nueva instancia de la Key
+
+                                      });
+                                    },
+                                    activeColor: Colors.black,
+                                    checkColor: Colors.blue,
+                                  ),*/
+
+                                )
+
+                            );
+                          },
+                        );
+                      }
                     },
-                    activeColor: Colors.grey,
-                    checkColor: Colors.blue,
-                  ),                );
-              },
-            );
-          }
-        },
+                  ),
+                ),
+              )
+            ]
+        ),
       ),
-    ),
       bottomSheet: Container(
-        padding: EdgeInsets.all(20.0),
+        height: 60, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
+        color: Colors.white,
+        //padding: EdgeInsets.all(20.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -472,12 +553,16 @@ class _CobranzaState extends State<Cobranza> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pushNamed(context, "/cobrarDeuda");
                     },
-                    child: Text(' COBRAR DEUDA'),
+                    child: Text(' COBRAR DEUDA',
+                      style: TextStyle(
+                        fontSize: 12,
+                      ),),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
@@ -495,6 +580,7 @@ class _CobranzaState extends State<Cobranza> {
                     ),
                   ),
                 ),
+                SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
@@ -504,7 +590,10 @@ class _CobranzaState extends State<Cobranza> {
                     child: Text(' COBRAR ANTICIPO',
                       style: TextStyle(
                         color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
-                      ),),
+                        fontSize: 12,
+                      ),
+
+                    ),
                     style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
@@ -526,6 +615,8 @@ class _CobranzaState extends State<Cobranza> {
                     ),
                   ),
                 ),
+                SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
+
               ],
             ),
           ],

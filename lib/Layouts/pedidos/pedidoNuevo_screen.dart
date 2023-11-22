@@ -31,6 +31,8 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
   List<dynamic>? menu2Options;
   List<dynamic>? menu3Options;
 
+  var baseUrl = direc;
+
   void _onMenuItemSelected(int index) {
     setState(() {
       _selectedIndex = index;
@@ -55,24 +57,27 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
         break;
     }
   }
+
   @override
   void initState() {
     super.initState();
     // Realizar solicitudes para obtener las opciones de los menús
     fetchMenuOptions();
   }
+
   Future<void> fetchMenuOptions() async {
     try {
       // Realizar solicitud para el primer menú
       final response1 = await http.post(
-        Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X1A_ORCH'),
+        Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X1A_ORCH"),
+        //Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X1A_ORCH'),
         headers: <String, String>{
           "Authorization": autorizacionGlobal,
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "username": "sbasilico",
-          "password": "Silvio71"
+          "username" : usuarioGlobal,
+          "password" : contraGlobal
         }),
       );
 
@@ -87,14 +92,15 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
 
       // Realizar solicitud para el segundo menú
       final response2 = await http.post(
-        Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X3A_ORCH'),
+        Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X3A_ORCH"),
+       // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X3A_ORCH'),
         headers: <String, String>{
           "Authorization": autorizacionGlobal,
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "username": "sbasilico",
-          "password": "Silvio71"
+          "username" : usuarioGlobal,
+          "password" : contraGlobal
         }),
       );
 
@@ -110,14 +116,15 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
 
       // Realizar solicitud para el tercer menú
       final response3 = await http.post(
-        Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X4A_ORCH'),
+        Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X4A_ORCH"),
+       // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X4A_ORCH'),
         headers: <String, String>{
           "Authorization": autorizacionGlobal,
           'Content-Type': 'application/json',
         },
         body: jsonEncode({
-          "username": "sbasilico",
-          "password": "Silvio71"
+          "username" : usuarioGlobal,
+          "password" : contraGlobal
         }),
       );
 
@@ -125,6 +132,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
         final data3 = json.decode(response3.body);
         setState(() {
           menu3Options = data3['MQ10X4A_DATAREQ']['rowset'] as List<dynamic>;
+
         });
       } else {
         throw Exception('Failed to load data for Menu 3');
@@ -380,7 +388,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   onChanged: (String? newValue) {
                     setState(() {
                       selectedOptionMenu2 = newValue;
-                      depositoGlobal = newValue.toString();
+                      depositoPedidoGlobal = newValue.toString();
                     });
                   },
                   items: menu2Options?.map<DropdownMenuItem<String>>((dynamic option) {
@@ -427,7 +435,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                 child: MyElevatedButton(
                   onPressed: () async {
                     navigateToIncidenteScreen(context);
-                    print(monedaGlobal+ depositoGlobal+ tipoPedidoGlobal);
+                    print(monedaGlobal+ depositoPedidoGlobal+ tipoPedidoGlobal);
 
                     // Acción al presionar el botón
                   },

@@ -15,7 +15,7 @@ class cobrarAnticipo extends StatefulWidget {
 
 class _cobrarAnticipoState extends State<cobrarAnticipo> {
   int _selectedIndex = 0;
-  var importeCobrar = totalDeudaGlobal;
+  var importeCobrar = totalDeudaGlobales;
   var  moneda = "";
   var fecha = "";
   var instrumendoPago = "";
@@ -27,6 +27,9 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
   late TextEditingController instrumendoPagoController;
   late TextEditingController bancoController;
   late TextEditingController numeroValorController;
+
+  var baseUrl = direc;
+
   //menu
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -57,13 +60,15 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
   //pop up de instrumento de pago
   Future<List<String>> fetchInstrumentosDePago() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X7A_ORCH'),
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X7A_ORCH"),
+
+      //Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X7A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71"
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
       }),
     );
 
@@ -81,13 +86,15 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
   //pop up de banco
   Future<List<String>> fetchBancos() async {
     final response = await http.post(
-      Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X6A_ORCH"),
+
+     // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode({
-        "username": "sbasilico",
-        "password": "Silvio71"
+        "username" : usuarioGlobal,
+        "password" : contraGlobal,
       }),
     );
 
@@ -144,7 +151,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
   @override
   void initState() {
     super.initState();
-    importeController = TextEditingController(text: totalDeudaGlobal);
+    importeController = TextEditingController(text: totalDeudaGlobales);
     monedaController = TextEditingController(text: monedaGlobal);
     fechaController = TextEditingController(text: _getCurrentDate());
     instrumendoPagoController = TextEditingController();
@@ -155,7 +162,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
   //TENER LA FECHA ACTUAL E INSERTARLA
   String _getCurrentDate() {
     DateTime now = DateTime.now();
-    String formattedDate = '${now.year}-${_formatDateValue(now.month)}-${_formatDateValue(now.day)}';
+    String formattedDate = '${_formatDateValue(now.day)}-${_formatDateValue(now.month)}-${now.year}';
     return formattedDate;
   }
 
@@ -469,7 +476,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
             )
         ),
         bottomSheet: Container(
-          padding: EdgeInsets.all(20.0),
+          height: 60, // Define una altura específica o usa un tamaño que se ajuste a tus necesidades
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -477,12 +484,30 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
                       },
-                      child: Text('CONFIRMAR'),
-                    ),
+                      child: Text(' CONFIRMAR',
+                        style: TextStyle(
+                          fontSize: 12,
+                        ),),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                          ),
+                        ),
+                      ),                    ),
                   ),
                   SizedBox(width: 10),
                   Expanded(
@@ -490,9 +515,34 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
                       onPressed: () {
                         // Lógica para cobrar anticipo
                       },
-                      child: Text('CANCELAR'),
-                    ),
+                      child: Text('  CANCELAR',
+                        style: TextStyle(
+                          color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                          fontSize: 12,
+                        ),
+
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                            side: BorderSide(
+                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                              width: 1.0, // Grosor del borde
+                            ),
+                          ),
+                        ),
+                      ),                    ),
                   ),
+                  SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                 ],
               ),
             ],

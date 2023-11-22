@@ -14,17 +14,20 @@ var esta6G = '';
 var emisor="";
 var  estado= "";
 var  version ="";
+var  depositoGlobal ="";
+var  depositoPedidoGlobal ="";
+var companiaGlobal = "";
 var nroOrdenGlobal = "";
 var nroActivoGlobal = "";
 var respuestaGlobal= "";
 var clienteGlobal= "";
+var cuitGlobal= "";
 var correoGlobal= "";
 var razonSocialGlobal= "";
 var tipoPedidoGlobal= "";
-var depositoGlobal= "";
 var rmonedaGlobal= "";
 var cobrarDeudaGlobal= "";
-var totalDeudaGlobal ="";
+var totalDeudaGlobales ="";
 
 
 

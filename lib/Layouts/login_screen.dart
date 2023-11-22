@@ -232,6 +232,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                       contraGlobal= value2;
                                       global.pass = value2;
                                     }
+                                    if(moneda.isNotEmpty){
+                                      monedaGlobal = myController5.text;
+                                    }
+                                    if(deposito.isNotEmpty){
+                                      depositoGlobal = myController11.text;
+                                    }
+
+                                    print("la moneda es : $monedaGlobal");
+                                    print("ldeposito es : $depositoGlobal");
+
                                     estadoAprobacionG = value5;
                                     estado = value5;
                                     print (value3 + value2+ value5);
@@ -385,7 +395,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               onChanged: (value) {
                                 value=  value.toUpperCase() ;
                                 compania = value;
-                                global.solicitanteG = value;
+                                global.companiaGlobal = value;
                                 setState(() {
                                   isCompaniaValid = true; // Restablecer la validez al editar
                                 });
@@ -533,7 +543,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               onChanged: (value) {
                                 value=  value.toUpperCase() ;
-                                deposito = value;
+                                instrumento = value;
                                 global.esta5G = value;
                               },
                             )
@@ -566,8 +576,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                       onChanged: (value) {
                                         value=  value.toUpperCase() ;
-                                        est6 = value;
-                                        global.esta6G = value;
+                                        deposito = value;
+                                        global.depositoGlobal = value;
                                       },
                                     )
                                 ) ),

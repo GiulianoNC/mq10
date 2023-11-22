@@ -43,6 +43,7 @@ android {
     }
 
     defaultConfig {
+
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.quantum.mq10"
         // You can update the following values to match your application needs.
@@ -52,14 +53,24 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        minSdkVersion 20 // Aumenta la versión mínima a 20 o a la que desees
 
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('C:\\Users\\Quantum\\venta.jks')
+            storePassword 'quantum01'
+            keyAlias 'quantum01'
+            keyPassword 'quantum01'
+        }
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 }
