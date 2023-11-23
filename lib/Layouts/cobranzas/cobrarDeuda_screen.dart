@@ -391,11 +391,12 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                     _onMenuItemSelected(2);
                   },
                 ),
+
                 ListTile(
-                  leading: Icon(Icons.settings,
+                  leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text('Cobranza',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -406,12 +407,11 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                     _onMenuItemSelected(3);
                   },
                 ),
-
                 ListTile(
-                  leading: Icon(Icons.monetization_on,
+                  leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text('Configuración',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,

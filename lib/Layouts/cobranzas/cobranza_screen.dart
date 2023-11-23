@@ -31,6 +31,7 @@ class _CobranzaState extends State<Cobranza> {
     item['Local_bruto'] == mapToCheck['Local_bruto'] &&
         item['Local_Pendiente'] == mapToCheck['Local_Pendiente']);
   }
+
   @override
   void initState() {
     super.initState();
@@ -55,36 +56,40 @@ class _CobranzaState extends State<Cobranza> {
     );
     print(usuarioGlobal+contraGlobal);
 
+
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
       final List<Map<String, dynamic>> rowsetData = data['MQ1006A_DATAREQ']['rowset'].cast<Map<String, dynamic>>();
-
+      print("data$data");
       return rowsetData.map((map) {
         final String monedaRespuesta = map['Moneda'] ?? '';
+        final bool mostrarForaneo = monedaGlobal != monedaRespuesta;
+        print("este es fornaeo $mostrarForaneo");
 
-        final bool mostrarLocal = monedaGlobal == monedaRespuesta;
-
-        final filteredData = mostrarLocal
-            ? {
-          'Local_bruto': map['Local_bruto'],
-          'Local_Pendiente': map['Local_Pendiente'],
+        if (mostrarForaneo) {
+          print("Foraneo_Bruto: ${map['Foraneo_Bruto']}");
+          print("Foraneo_Pendiente: ${map['Foraneo_Pendiente']}");
         }
-            : {
-          'Foraneo_Bruto': map['Foraneo_Bruto'],
-          'Foraneo_Pendiente': map['Foraneo_Pendiente'],
-        };
 
-        return {
+        final filteredData = {
           'Comprobante': map['Comprobante'] ?? '',
           'Doc_Tipo': map['Doc_Tipo'] ?? '',
           'Doc_Numero': map['Doc_Numero'] ?? '',
-          ...filteredData,
+          'Local_bruto': mostrarForaneo ? map['Foraneo_Bruto'] : map['Local_bruto'],
+          'Local_Pendiente': mostrarForaneo ? map['Foraneo_Pendiente'] : map['Local_Pendiente'],
+
         };
+
+        return filteredData;
       }).toList();
+
+
+
     } else {
       throw Exception('Failed to load data');
     }
   }
+
   //menu desplegable
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -116,21 +121,21 @@ class _CobranzaState extends State<Cobranza> {
 
 
   // Método para manejar los cambios en los CheckBoxes
-  int totalDeudaGlobal = 0;
+  num totalDeudaGlobal = 0;
 // Actualiza la función updateSelectedItem
   void updateSelectedItem(int index, bool selected) {
     final selectedLocalPendiente = data[index]['Local_Pendiente'];
-    final int parsedLocalPendiente = selectedLocalPendiente;
+    final selectedForaneoPendiente = data[index]['Foraneo_Pendiente'];
 
     setState(() {
       if (selected) {
         selectedItem.add(index);
-        totalDeudaGlobal += parsedLocalPendiente;
+        totalDeudaGlobal += (mostrarLocal ? selectedLocalPendiente : selectedForaneoPendiente) as num;
         totalDeudaGlobales = totalDeudaGlobal.toString();
         print("Total deuda global: $totalDeudaGlobal");
       } else {
         selectedItem.remove(index);
-        totalDeudaGlobal -= parsedLocalPendiente;
+        totalDeudaGlobal -= (mostrarLocal ? selectedLocalPendiente : selectedForaneoPendiente) as num;
         totalDeudaGlobales = totalDeudaGlobal.toString();
         print("Total deuda global: $totalDeudaGlobal");
       }

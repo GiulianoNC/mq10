@@ -605,9 +605,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               }
 
                               // Si todos los campos obligatorios son válidos, regresar a la página uno
-                              if (isUrlValid && isCompaniaValid && isMonedaValid) {
+                             /* if (isUrlValid && isCompaniaValid && isMonedaValid) {
                                 Navigator.pop(context);
-                              }
+                              }*/
                             },
                             child: Ink(
                                 child: Stack(

@@ -2,69 +2,91 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:mq10/Herramientas/global.dart';
 
 import '../Herramientas/boton.dart';
+import '../Herramientas/global.dart';
 import '../Herramientas/variables_globales.dart';
 
-class mail extends StatefulWidget {
-  const mail({Key? key}) : super(key: key);
+class MailScreen extends StatefulWidget {
+  const MailScreen({Key? key}) : super(key: key);
 
   @override
-  State<mail> createState() => _mailState();
+  State<MailScreen> createState() => _MailScreenState();
 }
 
-class _mailState extends State<mail> {
+class _MailScreenState extends State<MailScreen> {
+  String userEmail = ''; // Variable para almacenar el correo electrónico ingresado por el usuario
+  bool loading = false; // Estado para controlar la visibilidad del indicador de progreso
   int _selectedIndex = 0;
-  String selectedMail = ""; // Variable para almacenar el valor seleccionado del menú desplegable
-  bool loading = false; // Nuevo estado para controlar la visibilidad del indicador de progreso
-  List<String> mailOptions = [""]; // Lista para almacenar las opciones del menú desplegable
-  var baseUrl = direc;
 
-  @override
-  void initState() {
-    super.initState();
-    // Cargar las opciones del menú desplegable desde el servicio web aquí
-    loadMailOptions();
-    print("esto son los datos "+correoGlobal+razonSocialGlobal +clienteGlobal);
-  }
-  // Realizar una solicitud HTTP al servicio web y obtener las opciones de correo
-  Future<void> loadMailOptions() async {
+  Future<void> sendData() async {
+    setState(() {
+      loading = true; // Mostrar indicador de progreso al enviar la solicitud
+    });
 
-    final response = await http.post(Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1002B_ORCH"),
+    final baseUrl = direc;
+    final url = Uri.parse('$baseUrl/jderest/v3/orchestrator/MQ1002N_ORCH');
+
+    final response = await http.post(
+      url,
       headers: <String, String>{
-        "Authorization": autorizacionGlobal,
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        "username" : usuarioGlobal,
-        "password" : contraGlobal,
-        "Cliente": "",
-        "Correo":""
-      }
-      ),
+        "username": usuarioGlobal,
+        "password": contraGlobal,
+        "Cliente": clienteGlobal,
+        "Correo": userEmail, // Utiliza el correo electrónico ingresado por el usuario
+      }),
     );
+    print("datos "+ usuarioGlobal + contraGlobal);
 
+
+
+    setState(() {
+      loading = false; // Oculta el indicador de progreso después de la solicitud
+    });
 
     if (response.statusCode == 200) {
-       final data = json.decode(response.body);
-       //print(data);
-       final mailData = data['MQ1002BD_DATAREQ']['rowset'] as List<dynamic>;
-       final mailOptions = mailData
-           .map((mail) => mail['Correo'] as String)
-           .where((correo) => correo.trim().isNotEmpty) // Filtra las direcciones de correo no vacías
-           .toSet()// Usamos toSet() para eliminar duplicados
-
-           .toList();
-       setState(() {
-         this.mailOptions = mailOptions;
-         if (mailOptions.isNotEmpty) {
-           selectedMail = mailOptions[0]; // Establece el primer elemento como valor predeterminado
-         }
-       });
-     } else {
-      throw Exception('Failed to load data');
-       }
+      correoGlobal = userEmail;
+      // Si la solicitud es exitosa, muestra un AlertDialog con un mensaje de éxito
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('SUCCESS'),
+            content: const Text('envío éxitoso'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cierra el AlertDialog
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Si hay un error en la solicitud, muestra un mensaje de error
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text('Failed to send request. Status Code: ${response.statusCode}'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Cierra el AlertDialog
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   //menu desplegable
@@ -73,7 +95,7 @@ class _mailState extends State<mail> {
       _selectedIndex = index;
     });
     Navigator.of(context).pop(); // Cierra el menú lateral
-    // Agrega la lógica para navegar a las pantallas correspondientes aca
+    // Agrega la lógica para navegar a las pantallas correspondientes aquí
     switch (index) {
       case 0:
         Navigator.pushNamed(context, "/congrats");
@@ -92,85 +114,46 @@ class _mailState extends State<mail> {
         break;
     }
   }
-
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
+    return  MaterialApp(
+      home:       Scaffold(
         appBar: AppBar(
           flexibleSpace: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-            colors: <Color>[
-              Color.fromRGBO(102, 45, 145, 30),
-              Color.fromRGBO(212, 20, 90, 50),
-            ],
-          ),
-           )
-          ),
-          title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Column(
-              children: [
-                SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 10),
-                            Text(
-                              clienteGlobal,
-                              style: TextStyle(
-                                color: Color.fromRGBO(212, 20, 90, 1),
-                                fontSize: 10,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              razonSocialGlobal,
-                              style: TextStyle(
-                                color: Color.fromRGBO(102, 45, 145, 1),
-                                fontSize: 10,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            // SizedBox(width: 10),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-
-                ),
-                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(212, 20, 90, 1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Text(
-                    correoGlobal,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-              ],
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerRight,
+                end: Alignment.centerLeft,
+                colors: <Color>[
+                  Color.fromRGBO(102, 45, 145, 30),
+                  Color.fromRGBO(212, 20, 90, 50),
+                ],
+              ),
             ),
+          ),
+          title: Row(
+              children:[
+                Container(
+                  margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
+                  //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                  // alignment: Alignment.center,
+                  child: Image.asset("images/nombre.png",
+                    width: 150,
+                    height: 50,
+                  ),
+                ),
+                Expanded(child: Container()), // Esto empujará el ícono hacia la derecha
+                Padding(
+                  padding: EdgeInsets.only(top: 10, right: 10), // Ajusta estos valores según tus preferencias
+                  child: IconButton(
+                    icon: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    color: Colors.grey, // Cambia el color del ícono de flecha
+                  ),
+                ),
+              ]
           ),
           bottom: PreferredSize(
             preferredSize: Size.fromHeight(20.0),
@@ -288,66 +271,49 @@ class _mailState extends State<mail> {
             ),
           ),
         ),
-        body: Container(
+        body: Padding(
           padding: const EdgeInsets.all(16.0),
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('images/fondogris_solo.png'),
-              fit: BoxFit.cover,
-            ),
-          ),
-          constraints: const BoxConstraints.expand(),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: ' Email',
+                  border: OutlineInputBorder(),
                 ),
-                  child: DropdownButton<String>(
-                    value: selectedMail,
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedMail = newValue ?? ''; // Actualiza selectedMail con el nuevo valor seleccionado
-                      });
-                    },
-                    items: mailOptions.toSet().map((String mailOption) {
-                      return DropdownMenuItem<String>(
-                        value: mailOption,
-                        child: Text(mailOption),
-                      );
-                    }).toList(),
-                  )
+                onChanged: (value) {
+                  setState(() {
+                    userEmail = value; // Actualiza el valor del correo electrónico ingresado
+                  });
+                },
               ),
-              const Spacer(), // Agregar un Spacer para empujar el botón hacia abajo
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: MyElevatedButton(
-                  onPressed: () async {
-                    // Acción al presionar el botón
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 20.0),
+                child:   MyElevatedButton(
+                  onPressed: ()  async {
+                    sendData();
                   },
                   child: Ink(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          child: const Text('CONFIRMAR', textAlign: TextAlign.center),
-                        ),
-                        if (loading) CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)
-                      ],
-                    ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children:[
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            //  constraints: const BoxConstraints(minWidth: 88.0),
+                            child: const Text('CONFIRMAR', textAlign: TextAlign.center),
+                          ),
+                          if (loading)
+                            CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)
+                        ],)
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
-      ),
-
+      )
     );
   }
 }
+

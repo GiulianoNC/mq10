@@ -392,6 +392,21 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
                   },
                 ),
                 ListTile(
+                  leading: Icon(Icons.monetization_on,
+                    color: Colors.grey, // Cambia el color del icono
+                  ),
+                  title: Text('Cobranza',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  selected: _selectedIndex == 3,
+                  onTap: () {
+                    _onMenuItemSelected(3);
+                  },
+                ),
+                ListTile(
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
@@ -407,21 +422,6 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
                   },
                 ),
 
-                ListTile(
-                  leading: Icon(Icons.monetization_on,
-                    color: Colors.grey, // Cambia el color del icono
-                  ),
-                  title: Text('Cobranza',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),
-                  ),
-                  selected: _selectedIndex == 3,
-                  onTap: () {
-                    _onMenuItemSelected(3);
-                  },
-                ),
 
               ],
             ),

@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
         '/login': ( context) =>  LoginScreen(),
             '/congrats': ( context) =>  Primera(),
         '/nuevoCliente': ( context) =>  ClienteNuevo(),
-        '/mail': ( context) =>  mail(),
+        '/mail': ( context) =>  MailScreen(),
         '/pedidos': ( context) =>  Pedidos(),
         '/cobranza': ( context) =>  Cobranza(),
         '/pedidoNuevo': (BuildContext context) => PedidoNuevo(),
