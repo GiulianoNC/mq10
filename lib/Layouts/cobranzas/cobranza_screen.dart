@@ -53,6 +53,7 @@ class _CobranzaState extends State<Cobranza> {
         "Cia": companiaGlobal,
       }),
     );
+    print(usuarioGlobal+contraGlobal);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);

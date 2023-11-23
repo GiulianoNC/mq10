@@ -88,7 +88,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
     final response = await http.post(
       Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X6A_ORCH"),
 
-     // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
+      // Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X6A_ORCH'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -97,6 +97,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
         "password" : contraGlobal,
       }),
     );
+
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = jsonDecode(response.body);
@@ -136,9 +137,14 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
                   return ListTile(
                     title: Text(snapshot.data![index]),
                     onTap: () {
-                      // Aquí puedes establecer el valor seleccionado en el controlador respectivo
+                      if (title == "Instrumento de Pago") {
+                        instrumendoPagoController.text = snapshot.data![index];
+                      } else {
+                        bancoController.text = snapshot.data![index];
+                      }
                       Navigator.of(context).pop();
                     },
+
                   );
                 },
               ),
@@ -148,6 +154,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
       ),
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -223,6 +230,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -487,8 +495,79 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
                   SizedBox(width: 15), // Espaciado entre la primera fila y la segunda
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        var url =  Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1005C_ORCH");
+                        //  var url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1005C_ORCH');
+
+                        var requestBody = jsonEncode({
+                          "username" : usuarioGlobal,
+                          "password" : contraGlobal,
+                          "Compania": companiaGlobal,
+                          "Pagador": clienteGlobal,
+                          "Moneda": monedaGlobal,
+                          "Fecha": "12/10/2023",
+                          //"Fecha": fechaController.text, // Obtener la fecha del controlador
+                          "NroValor": numeroValorController.text,
+                          "InstrumentoPago": "4",
+                          //"InstrumentoPago": instrumendoPagoController.text,
+                          "Importe_valor": importeController.text,
+                          "Banco_valor": "999"
+                          // "Banco_valor": bancoController.text,
+                        });
+
+                        var response = await http.post(
+                          url,
+                          headers: <String, String>{
+                            'Content-Type': 'application/json; charset=UTF-8',
+                          },
+                          body: requestBody,
+                        );
+
+                        if (response.statusCode == 200) {
+                          var jsonResponse = jsonDecode(response.body);
+                          var nroRecibo = jsonResponse['NroRecibo'];
+                          var jdeStatus = jsonResponse['jde__status'];
+
+                          // Aquí puedes manejar la respuesta como desees, por ejemplo, mostrar un mensaje
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('APROBADO'),
+                                  content: Text('NroRecibo: $nroRecibo, jde__status: $jdeStatus.'),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                          print('NroRecibo: $nroRecibo, jde__status: $jdeStatus');
+                        } else {
+                          // En caso de error en la solicitud
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('ERROR'),
+                                  //   content: Text('NroRecibo: $nroRecibo, jde__status: $jdeStatus.'),
+                                  actions: <Widget>[
+                                    ElevatedButton(
+                                      child: Text('OK'),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              });
+                          print('Request failed with status: ${response.statusCode}.');
+                        }
                       },
+
                       child: Text(' CONFIRMAR',
                         style: TextStyle(
                           fontSize: 12,
@@ -555,6 +634,7 @@ class _cobrarAnticipoState extends State<cobrarAnticipo> {
 Widget buildTextField(String label, String hint, TextEditingController? controller, [VoidCallback? onTap]) {
   Color backgroundColor;
   Color textColor;
+  bool readOnlyField = false;
 
   if (label == "IMPORTE           \n A COBRAR ") {
     backgroundColor = Color.fromRGBO(212, 20, 90, 1); // Fondo personalizado
@@ -584,6 +664,7 @@ Widget buildTextField(String label, String hint, TextEditingController? controll
           child: TextField(
             controller: controller,
             onTap: onTap,
+            readOnly: readOnlyField, // Hace que el campo de texto sea de solo lectura
             decoration: InputDecoration(
               hintText: hint,
               filled: true,
@@ -607,4 +688,5 @@ Widget buildTextField(String label, String hint, TextEditingController? controll
     ),
   );
 }
+
 
