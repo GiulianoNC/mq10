@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       home: const SplashScreen(),
       routes: <String, WidgetBuilder>{
         '/splash': (BuildContext context) => const SplashScreen(),
-        '/login': ( context) =>  LoginScreen(),
+        '/login': (BuildContext context) =>  LoginScreen(),
             '/congrats': ( context) =>  Primera(),
         '/nuevoCliente': ( context) =>  ClienteNuevo(),
         '/mail': ( context) =>  MailScreen(),

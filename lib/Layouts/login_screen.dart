@@ -689,11 +689,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void>  _saveData(bool value0) async{
-    value = login;
+    /*value = login;
     value2=password;
     value3=direccion;
-    value4=emisor;
-    value5 = estados;
+    value4=compania;
+    value5 = moneda;
+    value6 = estado;
+    value7 = zona;
+    value8 = banco;
+    value9 = instrumento;
+    value10 = instrumento;
+    value11= deposito;*/
 
 
 
@@ -703,6 +709,12 @@ class _LoginScreenState extends State<LoginScreen> {
     prefs.setString("TestString_key3", value3);
     prefs.setString("TestString_key4", value4);
     prefs.setString("TestString_key5", value5);
+    prefs.setString("TestString_key6", value6);
+    prefs.setString("TestString_key7", value7);
+    prefs.setString("TestString_key8", value8);
+    prefs.setString("TestString_key9", value9);
+    prefs.setString("TestString_key10", value10);
+    prefs.setString("TestString_key11", value11);
 
 
 
@@ -722,6 +734,12 @@ class _LoginScreenState extends State<LoginScreen> {
     value3 = prefs.getString("TestString_key3")!;
     value4 = prefs.getString("TestString_key4")!;
     value5 = prefs.getString("TestString_key5")!;
+    value6 = prefs.getString("TestString_key6")!;
+    value7 = prefs.getString("TestString_key7")!;
+    value8 = prefs.getString("TestString_key8")!;
+    value9 = prefs.getString("TestString_key9")!;
+    value10 = prefs.getString("TestString_key10")!;
+    value11 = prefs.getString("TestString_key11")!;
 
 
     print(value + value2 +value3 +value4);
@@ -731,6 +749,13 @@ class _LoginScreenState extends State<LoginScreen> {
     myController3.text = value3;
     myController4.text = value4;
     myController5.text = value5;
+    myController6.text = value6;
+    myController7.text = value7;
+    myController8.text = value8;
+    myController9.text = value9;
+    myController10.text = value10;
+    myController11.text = value11;
+
 
 
 

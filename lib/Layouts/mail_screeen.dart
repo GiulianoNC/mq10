@@ -114,6 +114,7 @@ class _MailScreenState extends State<MailScreen> {
         break;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(

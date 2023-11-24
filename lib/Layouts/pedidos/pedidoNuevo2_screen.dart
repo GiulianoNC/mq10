@@ -158,15 +158,17 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
     //final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X2A_ORCH');
 
     final response = await http.post(
-      url,
+      Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X2A_ORCH"),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        "Authorization": autorizacionGlobal,
+        'Content-Type': 'application/json',
       },
       body: jsonEncode({
     "username" : usuarioGlobal,
     "password" : contraGlobal
       }),
     );
+
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

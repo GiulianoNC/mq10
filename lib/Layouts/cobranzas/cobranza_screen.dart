@@ -44,14 +44,16 @@ class _CobranzaState extends State<Cobranza> {
       Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ1006A_ORCH"),
       //Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1006A_ORCH'),
       headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
+        "Authorization": autorizacionGlobal,
+        'Content-Type': 'application/json',
       },
       body: jsonEncode({
         "username" : usuarioGlobal,
         "password" : contraGlobal,
+
         "Cliente":clienteGlobal,
         "Moneda": monedaGlobal,
-        "Cia": companiaGlobal,
+        "Cia":companiaGlobal
       }),
     );
     print(usuarioGlobal+contraGlobal);
