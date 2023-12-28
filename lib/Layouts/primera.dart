@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../Herramientas/boton.dart';
 import '../Herramientas/global.dart';
 import '../Herramientas/variables_globales.dart';
+import 'actualizacion.dart';
 
 class Primera extends StatefulWidget {
 
@@ -29,6 +31,9 @@ class _PrimeraState extends State<Primera> {
 
   final razonSocialController = TextEditingController();
   final cuitController = TextEditingController();
+
+  // Define una variable para controlar la visibilidad del campo CUIT
+  bool mostrarCampoCUIT = false;
 
   List<String> suggestions = [];
 
@@ -68,6 +73,41 @@ class _PrimeraState extends State<Primera> {
     }
   }
 
+  Future<void> buscarSugerenciasPorTaxID(String query) async {
+    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
+
+    final url = Uri.parse(baseUrl + api);
+    final body = jsonEncode({
+      "RAZON_SOCIAL": "",
+      "TAX_ID": query,
+    });
+
+    final headers = {
+      "Authorization": autorizacionGlobal,
+      'Content-Type': 'application/json',
+    };
+
+    try {
+      final response = await http.post(url, body: body, headers: headers);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body)["MQ1002BD_DATAREQ"]["rowset"];
+        final suggestionsList = data
+            .map<String>((entry) => entry["TAX_ID"].toString())
+            .toSet()
+            .toList();
+        setState(() {
+          suggestions = suggestionsList;
+        });
+      } else {
+        print("Error en la solicitud POST: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error en la solicitud POST: $e");
+    }
+  }
+
+
   //menu desplegable
   void _onMenuItemSelected(int index) {
     setState(() {
@@ -91,10 +131,13 @@ class _PrimeraState extends State<Primera> {
       case 4:
         Navigator.pushNamed(context, "/login");
         break;
+      case 5:
+        Navigator.pushNamed(context, "/actualizacion");
+        break;
     }
   }
 
-// Llama a esta función cuando se presiona el botón "BUSCAR"
+// Llama a esta función cuando se presiona la flechita desplegable
   Future<void> buscarCliente() async {
     razonSocialController.text = "";
     cuitController.text = "";
@@ -134,56 +177,124 @@ class _PrimeraState extends State<Primera> {
   //funcion para mostrar en el pop up
 // Dentro de la función que muestra las opciones del cliente
   Future<void> mostrarOpcionesDeCliente(Map<String, dynamic> data) async {
+    List<Map<String, dynamic>> opciones = List<Map<String, dynamic>>.from(
+        data["MQ1002BD_DATAREQ"]["rowset"]
+    );
+
     await showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text("Razón Social y CUIT"),
-          content: Container(
-            width: double.minPositive,
-            child: ListView(
-              children: data["MQ1002BD_DATAREQ"]["rowset"]
-                  .map<Widget>((entry) {
-                final razonSocial = entry["Razon_Social"].toString();
-                final taxId = entry["Tax_ID"].toString();
-                final cliente = entry["Cliente"].toString();
-                final correo = entry["Correo"].toString();
+        List<Map<String, dynamic>> filtradas = List<Map<String, dynamic>>.from(opciones);
 
-                return ListTile(
-                  title: Text(" $razonSocial, Tax_ID: $taxId"),
-                  onTap: () {
-                    setState(() {
-                      razonSocialController.text = razonSocial;
-                      cuitController.text = taxId; // Inserta el Tax ID seleccionado en el campo CUIT
-                      // Actualiza las variables de "Cliente" y "Correo" aquí
-                      this.cliente = cliente;
-                      clienteGlobal = this.cliente;
-                      this.correo = correo;
-                      correoGlobal = this.correo;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              }).toList(),
-            ),
-          ),
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(
+                translations['Razon Social y CUIT'] ?? '',
+              ),
+              content: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText:
+                      translations['BUSCAR'] ?? '',
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filtradas = opciones.where((option) {
+                          final razonSocial = option["Razon_Social"].toString().toLowerCase();
+                          final taxId = option["Tax_ID"].toString().toLowerCase();
+                          final searchValue = value.toLowerCase();
+                          return razonSocial.contains(searchValue) || taxId.contains(searchValue);
+                        }).toList();
+                      });
+                    },
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filtradas.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        final entry = filtradas[index];
+                        final razonSocial = entry["Razon_Social"].toString();
+                        final taxId = entry["Tax_ID"].toString();
+                        final cliente = entry["Cliente"].toString();
+                        final correo = entry["Correo"].toString();
+
+                        return ListTile(
+                          title: Text(" $razonSocial, Tax_ID: $taxId"),
+                          onTap: () {
+                            setState(() {
+                              razonSocialController.text = razonSocial;
+                              cuitController.text = taxId;
+                              clienteGlobal = cliente;
+                              correoGlobal = correo;
+                              mostrarCampoCUIT = true;
+
+                            });
+                            Navigator.pop(context);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
   }
+  late Map<String, String> translations = {};
 
   void initState() {
     super.initState();
     if(razonSocialGlobal.isNotEmpty){
       razonSocialController.text= razonSocialGlobal;
       cuitController.text= clienteGlobal;
+      mostrarCampoCUIT = true;
+    }
+    final clienteProvider = Provider.of<ClienteModel>(context, listen: false);
+
+    if (clienteProvider.clientesData.isEmpty) {
+      // No hay datos en el Provider, busca los datos del cliente
+      buscarCliente();
+    } else {
+      // Utiliza los datos del Provider
+      final data = clienteProvider.clientesData;
+      // Realiza la operación que necesites con los datos existentes
+      //mostrarOpcionesDeCliente(data);
+      print("hay datos$data");
+    }
+    if (isEnglish) {
+      translations = {
+        'ALTA CLIENTE': 'ALTA CLIENTE',
+        'Razon  Social': 'Razon  Social',
+        'ACEPTAR': 'ACEPTAR',
+        'NUEVO': 'NUEVO',
+        'BUSCAR': 'BUSCAR',
+        'Razon Social y CUIT': 'Razon Social y CUIT',
+
+      };
+    } else {
+      translations = {
+        'ALTA CLIENTE': 'Customer Registration',
+        'Razon  Social': 'Company  Name',
+        'ACEPTAR': 'ACEPT',
+        'NUEVO': 'NEW',
+       ' BUSCAR': 'SEARCH',
+         'Razon Social y CUIT': 'Comapany Name and CUIT',
+
+    };
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: Scaffold(
         appBar: AppBar(
           flexibleSpace: Container(
@@ -328,9 +439,24 @@ class _PrimeraState extends State<Primera> {
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 3,
+                  selected: _selectedIndex == 4,
                   onTap: () {
-                    _onMenuItemSelected(3);
+                    _onMenuItemSelected(4);
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.download_done,
+                    color: Colors.grey, // Cambia el color del icono
+                  ),
+                  title: Text('Actualización',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: Colors.black,
+                    ),
+                  ),
+                  selected: _selectedIndex == 5,
+                  onTap: () {
+                    _onMenuItemSelected(5);
                   },
                 ),
 
@@ -338,101 +464,61 @@ class _PrimeraState extends State<Primera> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          child:Center(
-            child : Container(
-              constraints: BoxConstraints(
-                maxWidth: double.infinity,
-                minHeight: MediaQuery.of(context).size.height, // Ajusta la altura del Container al alto de la pantalla
-              ),
-              padding: const EdgeInsets.all(16.0),
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('images/fondogris_solo.png'),
-                  fit: BoxFit.cover, // Ajusta la imagen para cubrir completamente el Container
+        body:
+        Container(
+          constraints: BoxConstraints(
+            maxWidth: double.infinity,
+            minHeight: MediaQuery.of(context).size.height, // Ajusta la altura del Container al alto de la pantalla
+          ),
+          padding: const EdgeInsets.all(16.0),
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('images/fondogris_solo.png'),
+              fit: BoxFit.fill, // Ajusta la imagen para cubrir completamente el Container
+            ),
+          ),
+          //constraints: const BoxConstraints.expand(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  translations['ALTA CLIENTE'] ?? '',
+                  style: TextStyle(
+                    color: Color.fromRGBO(102, 45, 145, 30),
+                    fontSize: 20,
+                    fontWeight: FontWeight.normal,
+                  ),
                 ),
               ),
-              //constraints: const BoxConstraints.expand(),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              SizedBox(height: 20),
+              Column(
                 children: [
-                  Center(
-                    child: Text(
-                      'ALTA CLIENTE',
-                      style: TextStyle(
-                        color: Color.fromRGBO(102, 45, 145, 30),
-                        fontSize: 20,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Column(
-                    children: [
-                      Column(
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 25),
-                            ],
-                          ),
-                          SizedBox(height: 16), // Espacio entre los campos
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Center(
-                                child: Container(
-                                  width: double.infinity, // Ocupar casi todo el ancho del renglón
-                                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: TextField(
-                                    controller: cuitController,
-                                    decoration: InputDecoration(
-                                      hintText: 'CUIT',
-                                      border: InputBorder.none,
-                                    ),
-                                    onChanged: (value) {
-                                      cuit = value;
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 25), // Espacio entre los campos
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
                       Center(
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 16),
-                            Center(
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: 
-                                Row(
-                                  children: [
-                                    Expanded(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 16),
+                              Center(
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child:
+                                  Row(
+                                    children: [
+                                      Expanded(
                                         child:  TextField(
                                           controller: razonSocialController,
                                           decoration: InputDecoration(
-                                            hintText: 'Razon Social',
+                                            hintText: translations?['Razon  Social'] ?? '',
                                             border: InputBorder.none,
                                           ),
                                           onChanged: (value) {
@@ -440,157 +526,183 @@ class _PrimeraState extends State<Primera> {
                                             buscarSugerencias(value);
                                           },
                                         ),
-                                    ),
-                                    IconButton(
-                                      icon: Icon(Icons.arrow_drop_down),
-                                      onPressed: buscarCliente,
+                                      ),
+                                      IconButton(
+                                        icon: Icon(Icons.arrow_drop_down),
+                                        onPressed: buscarCliente,
 
-                                    ),
-                                  ],
+                                      ),
+                                    ],
+                                  ),
+
                                 ),
-
                               ),
-                            ),
-                           /* ElevatedButton(
-                              onPressed: () {
-                                // Guarda el valor en la variable global al presionar el botón de confirmación
-                                setState(() {
-                                  razonSocialGlobal = razonSocialController.text;
-                                  clienteGlobal= this.cliente ;
-                                  correoGlobal =this.correo ;
-
-                                  if(correo.isEmpty){
-
-                                  }
-                                });
-                              },
-                              child: Icon(Icons.check, color: Colors.white),
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.green, // Color de fondo del botón de confirmación
-                                shape: CircleBorder(), // Botón redondo
-                              ),
-                            ),*/
-                            // Mostrar las sugerencias en una lista emergente debajo del TextField
-                            if (suggestions.isNotEmpty)
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Column(
-                                  children: suggestions
-                                      .where((suggestion) => suggestion.toLowerCase().contains(razonSocialController.text.toLowerCase()))
-                                      .toList()
-                                      .map(
-                                        (suggestion) => ListTile(
-                                      title: Text(suggestion),
-                                      onTap: () {
-                                        setState(() {
-                                          razonSocialController.text = suggestion;
-                                          suggestions = [];
-                                        });
-                                      },
-                                    ),
-                                  )
-                                      .toList(),
-
-                              ),
-
-                           )  ]
+                              // Mostrar las sugerencias en una lista emergente debajo del TextField
+                              if (suggestions.isNotEmpty)
+                                Container(
+                                  width: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Column(
+                                    children: suggestions
+                                        .where((suggestion) => suggestion.toLowerCase().contains(razonSocialController.text.toLowerCase()))
+                                        .toList()
+                                        .map(
+                                          (suggestion) => ListTile(
+                                        title: Text(suggestion),
+                                        onTap: () {
+                                          setState(() {
+                                            razonSocialController.text = suggestion;
+                                            suggestions = [];
+                                          });
+                                        },
+                                      ),
+                                    ).toList(),
+                                  ),
+                                )  ]
                         ),
                       ),
                     ],
                   ),
-                  SizedBox(height: 220),
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center, // Para centrar los botones horizontalmente
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Cliente: $razonSocialGlobal'),
-                                  //   content: Text('La operación se realizó con éxito.'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      child: Text('Aceptar'),
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                            // Guarda el valor en la variable global al presionar el botón de confirmación
-                            setState(() {
-                              razonSocialGlobal = razonSocialController.text;
-                              cuitGlobal= cuitController.text ;
-                              if(correoGlobal.isEmpty){
-                                correoGlobal =this.correo ;
-                              }
-                            });
-
-                          },
-                          child: Text('     ACEPTAR    '),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.pressed)) {
-                                  return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
-                                }
-                                return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
-                              },
-                            ),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0), // Aplica un radio
-                              ),
-                            ),
-                          ),                        ),
-                        SizedBox(width: 16), // Espacio entre los botones
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, "/nuevoCliente");
-                          },
-                          child: Text('      NUEVO      ',
-                            style: TextStyle(
-                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
-                            ),),
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
-                                if (states.contains(MaterialState.pressed)) {
-                                  return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
-                                }
-                                return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
-                              },
-                            ),
-                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0), // Aplica un radio
-                                side: BorderSide(
-                                  color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
-                                  width: 1.0, // Grosor del borde
-                                ),
-                              ),
-                            ),
-                          ),                        ),
-                      ],
-                    ),
-                  )
-                  // Otro contenido aquí si es necesario
                 ],
               ),
-            ),
+              SizedBox(height: 15), // Espacio entre los campos
+              Visibility(
+                visible: mostrarCampoCUIT,
+                child:  Column(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: 25),
+                      ],
+                    ),
+                    SizedBox(height: 16), // Espacio entre los campos
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Container(
+                            width: double.infinity, // Ocupar casi todo el ancho del renglón
+                            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: TextField(
+                              controller: cuitController,
+                              decoration: InputDecoration(
+                                hintText: 'CUIT',
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                cuit = value;
+
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 120),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Para centrar los botones horizontalmente
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Cliente: $razonSocialGlobal'),
+                              //   content: Text('La operación se realizó con éxito.'),
+                              actions: <Widget>[
+                                TextButton(
+                                  child: Text(
+                                    translations['ACEPTAR'] ?? '',
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                        // Guarda el valor en la variable global al presionar el botón de confirmación
+                        setState(() {
+                          razonSocialGlobal = razonSocialController.text;
+                          cuitGlobal= cuitController.text ;
+                          if(correoGlobal.isEmpty){
+                            correoGlobal =this.correo ;
+                          }
+                        });
+
+                      },
+                      child: Text(
+                        translations['ACEPTAR'] ?? '',
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(212, 20, 90, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                          ),
+                        ),
+                      ),                        ),
+                    SizedBox(width: 16), // Espacio entre los botones
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, "/nuevoCliente");
+                      },
+                      child: Text(
+                        translations['NUEVO'] ?? '',
+                        style: TextStyle(
+                          color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                        ),),
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                            if (states.contains(MaterialState.pressed)) {
+                              return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                            }
+                            return Color.fromRGBO(255, 255, 255, 1.0); // Fondo rojo cuando está presionado
+                          },
+                        ),
+                        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0), // Aplica un radio
+                            side: BorderSide(
+                              color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
+                              width: 1.0, // Grosor del borde
+                            ),
+                          ),
+                        ),
+                      ),                        ),
+                  ],
+                ),
+              )
+              // Otro contenido aquí si es necesario
+            ],
           ),
         ),
-        ),
-      );
+      ),
+    );
   }
 }
+
+

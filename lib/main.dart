@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:mq10/Layouts/cobranzas/cobrarDeuda_screen.dart';
+import 'package:provider/provider.dart';
 import 'Herramientas/SplashScreen.dart';
+import 'Layouts/actualizacion.dart';
 import 'Layouts/cobranzas/cobranza_screen.dart';
 import 'Layouts/cobranzas/cobrarAnticipo_screen.dart';
 import 'Layouts/login_screen.dart';
@@ -13,7 +15,23 @@ import 'Layouts/primera.dart';
 
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ClienteModel>(
+          create: (_) => ClienteModel(),
+        ),
+        ChangeNotifierProvider<EstadoModel>(
+          create: (_) => EstadoModel(),
+        ),
+        ChangeNotifierProvider<PedidoModel>(
+          create: (_) => PedidoModel(),
+        ),
+        // Otros providers si los tienes
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,6 +54,7 @@ class MyApp extends StatelessWidget {
         '/pedidoNuevo': (BuildContext context) => PedidoNuevo(),
         '/cobrarDeuda': (BuildContext context) => cobrarDeuda(),
         '/cobrarAnticipo': (BuildContext context) => cobrarAnticipo(),
+        '/actualizacion': (BuildContext context) => actualizacion(),
 
         /* '/correctivo': ( context) =>  MantenimientoScreen(),
         '/motivo': ( context) =>  motivo(),

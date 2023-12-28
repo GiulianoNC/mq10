@@ -18,6 +18,7 @@ class LoginScreen extends StatefulWidget {
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
+
 class _LoginScreenState extends State<LoginScreen> {
   bool isChecked = false;
   var login = '';
@@ -47,10 +48,6 @@ class _LoginScreenState extends State<LoginScreen> {
   var value9 ="";
   var value10 ="";
   var value11 ="";
-
-
-  bool _isChecked = false;
-
   // Variables booleanas para rastrear si los campos obligatorios son válidos
   bool isUrlValid = true;
   bool isCompaniaValid = true;
@@ -66,7 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
   final myController8 = TextEditingController();
   final myController9 = TextEditingController();
   final myController10 = TextEditingController();
-  final myController11 = TextEditingController();
+  final myController11 = TextEditingController();//obsoleto
+  bool _isChecked = false;
+
   Icon icon = Icon (Icons.visibility);
   bool obscure = true;
   bool loading = false; // Nuevo estado para controlar la visibilidad del indicador de progreso
@@ -77,15 +76,208 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose(){
     controller.dispose();
     super.dispose();
+    _loadSavedData();
+  }
+  @override
+  void disponse(){
+    myController.dispose();
+    myController2.dispose();
+    myController3.dispose();
+    myController4.dispose();
+    myController5.dispose();
+    myController6.dispose();
+    myController7.dispose();
+    myController8.dispose();
+    myController9.dispose();
+    myController10.dispose();
+
+    super.dispose();
   }
 
+  Future<void> _saveData(bool value) async {
+    setState(() {
+      isChecked = value;
+    });
 
+    String loginValue = myController.text;
+    String passwordValue = myController2.text;
+    String direccionValue = myController3.text;
+    String companiaValue = myController4.text;
+    String monedaValue = myController5.text;
+    String estadoValue = myController6.text;
+    String zonaValue = myController7.text;
+    String bancoValue = myController8.text;
+    String instrumentoValue = myController9.text;
+    String depositoValue = myController10.text;
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    if (value) {
+      prefs.setString('login', loginValue);
+      prefs.setString('password', passwordValue);
+      prefs.setString('direccion', direccionValue);
+      prefs.setString('compania', companiaValue);
+      prefs.setString('moneda', monedaValue);
+      prefs.setString('estado', estadoValue);
+      prefs.setString('zona', zonaValue);
+      prefs.setString('banco', bancoValue);
+      prefs.setString('instrumento', instrumentoValue);
+      prefs.setString('deposito', depositoValue);
+
+    } else {
+      prefs.remove('login');
+      prefs.remove('password');
+      prefs.remove('direccion');
+      prefs.remove('compania');
+      prefs.remove('moneda');
+      prefs.remove('estado');
+      prefs.remove('zona');
+      prefs.remove('banco');
+      prefs.remove('instrumento');
+      prefs.remove('deposito');
+
+    }
+    // Guardar el estado del checkbox
+    prefs.setBool('isChecked', value);
+
+    // Agregar logs para verificar los datos guardados
+    print('Datos guardados en SharedPreferences:');
+    print('Login: $loginValue');
+    print('Password: $passwordValue');
+    print('Dirección: $direccionValue');
+    print('Moneda: $monedaValue');
+    print('Estado del checkbox: $value');
+  }
+
+  void _loadSavedData() async {
+    // Cargar los valores guardados desde SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      myController.text = prefs.getString('login') ?? '';
+      myController2.text = prefs.getString('password') ?? '';
+      myController3.text = prefs.getString('direccion') ?? '';
+      myController4.text = prefs.getString('compania') ?? '';
+      myController5.text = prefs.getString('moneda') ?? '';
+      myController6.text = prefs.getString('estado') ?? '';
+      myController7.text = prefs.getString('zona') ?? '';
+      myController8.text = prefs.getString('banco') ?? '';
+      myController9.text = prefs.getString('instrumento') ?? '';
+      myController10.text = prefs.getString('deposito') ?? '';
+
+      _isChecked = prefs.getBool('isChecked') ?? false; // Cargar el estado del checkbox
+    });
+
+    // Agregar logs para verificar los datos cargados
+    print('Datos cargados desde SharedPreferences:');
+    print('Login: ${myController.text}');
+    print('Password: ${myController2.text}');
+    print('Dirección: ${myController3.text}');
+    print('compania: ${myController4.text}');
+    print('Estado del checkbox cargado: $_isChecked');
+  }
+
+  //para las traducciones
+  late Map<String, String> translations = {};
+
+  void _toggleLanguage() {
+    setState(() {
+      // Cambiar el idioma y las traducciones basado en el idioma actual
+      if (isEnglish) {
+        _cambiarIdioma('en'); // Cambiar al español
+        isEnglish = false; // Cambiar el estado del idioma
+      } else {
+        _cambiarIdioma('es'); // Cambiar al inglés
+        isEnglish = true; // Cambiar el estado del idioma
+      }
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedData(); // Cargar los datos al iniciar la aplicación
+    // Inicializar las traducciones en el idioma por defecto (español, por ejemplo)
+    translations = {
+      'Usuario': 'Usuario',
+      'Contraseña': 'Contraseña',
+      'Iniciar sesión': 'Iniciar sesión',
+      'RECORDAR': 'RECORDAR',
+      "COMPANIA": "COMPANIA",
+      "MONEDA":"MONEDA",
+      "ESTADO": "ESTADO",
+      "ZONA": "ZONA",
+      "BANCO": "BANCO",
+      "INSTRUMENTO": "INSTRUMENTO",
+      "DEPOSITO": "DEPOSITO",
+      "CONFIRMAR": "CONFIRMAR"
+
+    };
+
+  }
+
+  void _cambiarIdioma(String languageCode) {
+    setState(() {
+      if (languageCode == 'en') {
+        translations = {
+          'Usuario': 'Username',
+          'Contraseña': 'Password',
+          'Iniciar sesión': 'Sign In',
+          'RECORDAR': 'REMEMBER',
+          "COMPANIA": "COMPANY",
+          "MONEDA":"COIN",
+          "ESTADO": "STATE",
+          "ZONA": "ZONE",
+          "BANCO": "BANK",
+          "INSTRUMENTO": "INSTRUMENT",
+          "DEPOSITO": "STORAGE",
+          "CONFIRMAR": "CONFIRM"
+          // Add all English translations here
+        };
+      } else {
+        translations = {
+          'Usuario': 'Usuario',
+          'Contraseña': 'Contraseña',
+          'Iniciar sesión': 'Iniciar sesión',
+          'RECORDAR': 'RECORDAR',
+          "COMPANIA": "COMPANIA",
+          "MONEDA":"MONEDA",
+          "ESTADO": "ESTADO",
+          "ZONA": "ZONA",
+          "BANCO": "BANCO",
+          "INSTRUMENTO": "INSTRUMENTO",
+          "DEPOSITO": "DEPOSITO",
+          "CONFIRMAR": "CONFIRMAR"
+          // Add all Spanish translations here
+        };
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Container(
+      appBar: AppBar(
+        // Agregar el botón de bandera en el AppBar
+        actions: [
+          IconButton(
+            onPressed: _toggleLanguage, // Usar la función para cambiar el idioma y el icono
+            icon: isEnglish
+                ? Image.asset(
+              'images/uk_flag.png',
+              width: 40,
+              height: 40,
+            )
+                : Image.asset(
+              'images/spain_flag.jpg',
+              width: 40,
+              height: 40,
+            ),
+          ),
+        ],
+      ),
+      resizeToAvoidBottomInset: true,
+      body:
+      Container(
           padding: const EdgeInsets.only(bottom: 80),
           decoration: const BoxDecoration(
             image: DecorationImage(
@@ -110,11 +302,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextField(
                         controller: myController,
                         style: const TextStyle(color: Colors.black,),
-                        decoration: const InputDecoration(
+                        decoration:  InputDecoration(
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: 'Usuario',
-                          hintStyle: TextStyle(color: Colors.grey),
+                          hintText: translations?['Usuario'] ?? '',                          hintStyle: TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
                               Radius.circular(10.0),
@@ -157,8 +348,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           filled: true,
                           fillColor: Colors.white,
-                          hintText: 'Contraseña',
-                          hintStyle: TextStyle(color: Colors.grey),
+                          hintText: translations?['Contraseña'] ?? '',                          hintStyle: TextStyle(color: Colors.grey),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(
                               Radius.circular(10.0),
@@ -179,7 +369,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: CheckboxListTile(
                         //cambia de lugar poniendo primero el check y despues el texto
                         controlAffinity: ListTileControlAffinity.leading,
-                        title: Text('RECORDAR',
+                        title: Text(
+                          translations != null ? translations['RECORDAR'] ?? '' : '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Color.fromRGBO(102, 45, 145, 30),
@@ -189,10 +380,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         value: _isChecked,
                         activeColor: Color.fromRGBO(102, 45, 145, 30),
                         checkColor: Colors.white,
-                        onChanged: (bool? value0) {
-                          if (value0 != null) {
-                            _saveData(value0);
+                        onChanged: (bool? value) {
+                          if (value != null) {
+                            setState(() {
+                              _isChecked = value; // Actualiza el estado del checkbox
+                            });
+                            _saveData(_isChecked);
                           }
+
                         },
                       ),
                     ),
@@ -214,23 +409,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                   try{
                                     //yo
                                     if (direccion.isEmpty){
-                                      direccion = value3;
-                                      global.direc = value3;
+                                      direccion = myController3.text;
+                                      global.direc = myController3.text;
 
                                     }
                                     if (emisor.isEmpty){
-                                      emisor = value4;
-                                      global.emisor = value4;
+                                      emisor = myController4.text;
+                                      global.emisor = myController4.text;
                                     }
                                     if(login.isEmpty){
-                                      login = value;
-                                      usuarioGlobal = value;
-                                      global.user = value;
+                                      login = myController.text;
+                                      usuarioGlobal = myController.text;
+                                      global.user = myController.text;
                                     }
                                     if(password.isEmpty){
-                                      password = value2;
-                                      contraGlobal= value2;
-                                      global.pass = value2;
+                                      password = myController2.text;
+                                      contraGlobal= myController2.text;
+                                      global.pass = myController2.text;
                                     }
                                     if(moneda.isNotEmpty){
                                       monedaGlobal = myController5.text;
@@ -238,6 +433,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                     if(deposito.isNotEmpty){
                                       depositoGlobal = myController11.text;
                                     }
+                                    print('Login: ${myController.text}');
+                                    print('Password: ${myController2.text}');
+                                    print('Dirección: ${myController3.text}');
+                                    print('compania: ${myController4.text}');
 
                                     print("la moneda es : $monedaGlobal");
                                     print("ldeposito es : $depositoGlobal");
@@ -258,10 +457,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       "password": contraGlobal,
                                     });
 
+                                    _saveData(_isChecked); // Guardar datos cuando cambia el campo de usuario
+
                                     //transformo el usuario y contraseña en base 64
                                     autorizacionGlobal = 'Basic '+base64Encode(utf8.encode('$login:$password'));
                                     print(autorizacionGlobal );
-                                    Navigator.pushNamed(context, "/congrats");
+                                    //Navigator.pushNamed(context, "/congrats");
 
                                     var _headers = {
                                       "Authorization" : autorizacionGlobal,
@@ -277,6 +478,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       Navigator.pushNamed(context, "/congrats");
 
                                       print("este es el status " + response.statusCode.toString());
+                                      _saveData(_isChecked); // Guardar datos cuando cambia el campo de usuario
 
 
                                     } else {
@@ -316,7 +518,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         Container(
                                           // padding: const EdgeInsets.all(10),
                                           //  constraints: const BoxConstraints(minWidth: 88.0),
-                                          child: const Text('INGRESAR', textAlign: TextAlign.center),
+                                          child:  Text(
+                                              translations != null ? translations['Iniciar sesión'] ?? '' : '',                                              textAlign: TextAlign.center),
                                         ),
                                         if (loading)
                                           CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)
@@ -383,7 +586,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration:  InputDecoration(
                                 filled: true,
                                 fillColor: isCompaniaValid ? Colors.white : Colors.red, // Mostrar en rojo si no es válido
-                                hintText: 'COMPAÑIA',
+                                hintText: translations?['COMPANIA'] ?? '',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
@@ -412,7 +615,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration:  InputDecoration(
                                 filled: true,
                                 fillColor: isMonedaValid ? Colors.white : Colors.red, // Mostrar en rojo si no es válido
-                                hintText: 'MONEDA',
+                                hintText: translations?['MONEDA'] ?? '',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
@@ -442,10 +645,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: const TextStyle(
                                 color: Colors.black,
                               ),
-                              decoration: const InputDecoration(
+                              decoration:  InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                hintText: 'ESTADO',
+                                hintText: translations?['ESTADO'] ?? '',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
@@ -471,10 +674,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: const TextStyle(
                                         color: Colors.black,
                                       ),
-                                      decoration: const InputDecoration(
+                                      decoration:  InputDecoration(
                                         filled: true,
                                         fillColor: Colors.white,
-                                        hintText: 'ZONA',
+                                        hintText: translations?['ZONA'] ?? '',
                                         hintStyle: TextStyle(color: Colors.grey),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
@@ -496,17 +699,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           //distancia margen
                           height: 12,
                         ),
-                          Container(
-                              padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 20.0),
+                        Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 20.0),
                             child: TextField(
                               controller: myController8,
                               style: const TextStyle(
                                 color: Colors.black,
                               ),
-                              decoration: const InputDecoration(
+                              decoration:  InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                hintText: 'BANCO',
+                                hintText: translations?['BANCO'] ?? '',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
@@ -522,17 +725,17 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             )
                         ),
-                          Container(
-                              padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 20.0),
+                        Container(
+                            padding: const EdgeInsets.symmetric(vertical: 3.0, horizontal: 20.0),
                             child: TextField(
                               controller: myController10,
                               style: const TextStyle(
                                 color: Colors.black,
                               ),
-                              decoration: const InputDecoration(
+                              decoration:  InputDecoration(
                                 filled: true,
                                 fillColor: Colors.white,
-                                hintText: 'INSTRUMENTO',
+                                hintText: translations?['INSTRUMENTO'] ?? '',
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.all(
@@ -562,10 +765,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: const TextStyle(
                                         color: Colors.black,
                                       ),
-                                      decoration: const InputDecoration(
+                                      decoration:  InputDecoration(
                                         filled: true,
                                         fillColor: Colors.white,
-                                        hintText: 'DEPOSITO',
+                                        hintText: translations?['DEPOSITO'] ?? '',
                                         hintStyle: TextStyle(color: Colors.grey),
                                         border: OutlineInputBorder(
                                           borderRadius: BorderRadius.all(
@@ -604,19 +807,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               }
 
-                              // Si todos los campos obligatorios son válidos, regresar a la página uno
-                             /* if (isUrlValid && isCompaniaValid && isMonedaValid) {
-                                Navigator.pop(context);
-                              }*/
+                              if (isUrlValid && isCompaniaValid && isMonedaValid) {
+                                controller.animateToPage(
+                                  0, // Índice de la página que contiene los campos de usuario y contraseña
+                                  duration: Duration(milliseconds: 500), // Duración de la animación
+                                  curve: Curves.ease, // Curva de animación
+                                );
+                              }
                             },
                             child: Ink(
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children:[
                                     Container(
-                                       padding: const EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(10),
                                       //  constraints: const BoxConstraints(minWidth: 88.0),
-                                      child: const Text('CONFIRMAR', textAlign: TextAlign.center),
+                                      child:  Text(
+                                          translations?['CONFIRMAR'] ?? '',
+                                          textAlign: TextAlign.center),
                                     ),
                                     if (loading)
                                       CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)
@@ -682,50 +890,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _cargarPreferencias();
-  }
-
-  Future<void>  _saveData(bool value0) async{
-    /*value = login;
-    value2=password;
-    value3=direccion;
-    value4=compania;
-    value5 = moneda;
-    value6 = estado;
-    value7 = zona;
-    value8 = banco;
-    value9 = instrumento;
-    value10 = instrumento;
-    value11= deposito;*/
-
-
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("TestString_key", value);
-    prefs.setString("TestString_key2", value2);
-    prefs.setString("TestString_key3", value3);
-    prefs.setString("TestString_key4", value4);
-    prefs.setString("TestString_key5", value5);
-    prefs.setString("TestString_key6", value6);
-    prefs.setString("TestString_key7", value7);
-    prefs.setString("TestString_key8", value8);
-    prefs.setString("TestString_key9", value9);
-    prefs.setString("TestString_key10", value10);
-    prefs.setString("TestString_key11", value11);
-
-
-
-
-    setState(() {
-      _isChecked = value0;
-      prefs.setBool('isChecked', value0);
-    });
-
-
-  }
   Future<void> _cargarPreferencias() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -756,14 +920,10 @@ class _LoginScreenState extends State<LoginScreen> {
     myController10.text = value10;
     myController11.text = value11;
 
-
-
-
     setState(() {
       _isChecked = (prefs.getBool('isChecked') ?? false);
     });
   }
-
 }
 
 

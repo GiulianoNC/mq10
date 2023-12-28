@@ -28,7 +28,7 @@ var tipoPedidoGlobal= "";
 var rmonedaGlobal= "";
 var cobrarDeudaGlobal= "";
 var totalDeudaGlobales ="";
-
+bool isEnglish = false;
 
 
 
