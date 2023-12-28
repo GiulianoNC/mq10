@@ -277,7 +277,13 @@ class _PrimeraState extends State<Primera> {
         'NUEVO': 'NUEVO',
         'BUSCAR': 'BUSCAR',
         'Razon Social y CUIT': 'Razon Social y CUIT',
-
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+        'Actualización': 'Actualización',
       };
     } else {
       translations = {
@@ -288,6 +294,13 @@ class _PrimeraState extends State<Primera> {
        ' BUSCAR': 'SEARCH',
          'Razon Social y CUIT': 'Comapany Name and CUIT',
 
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+        'Actualización': 'Update',
     };
     }
   }
@@ -376,7 +389,8 @@ class _PrimeraState extends State<Primera> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Cliente',
+                  title: Text(
+                    translations['Cliente'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -403,7 +417,8 @@ class _PrimeraState extends State<Primera> {
                   leading: Icon(Icons.checklist,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Pedidos',
+                  title: Text(
+                    translations['Pedidos'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -418,7 +433,8 @@ class _PrimeraState extends State<Primera> {
                   leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text(
+                    translations['Cobranza'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -433,7 +449,8 @@ class _PrimeraState extends State<Primera> {
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text(
+                    translations['Configuración'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -448,7 +465,8 @@ class _PrimeraState extends State<Primera> {
                   leading: Icon(Icons.download_done,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Actualización',
+                  title: Text(
+                    translations['Actualización'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,

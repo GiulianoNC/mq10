@@ -322,200 +322,258 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
     }
   }
 
+  late Map<String, String> translations = {};
+
+  void initState() {
+    super.initState();
+
+    if (isEnglish) {
+      translations = {
+        'TIPO DE PEDIDO': 'TIPO DE PEDIDO',
+        'DEPOSITO': 'DEPOSITO',
+        'MONEDA': 'MONEDA',
+        'CODIGO': 'CODIGO',
+        'CANTIDAD': 'CANTIDAD',
+        'CONTINUAR': 'CONTINUAR',
+        'PRODUCTO': 'PRODUCTO',
+        'Confirmar acción': 'Confirmar acción',
+        '¿Qué acción deseas realizar?': '¿Qué acción deseas realizar?',
+        'Enviar': 'Enviar',
+        'Eliminar': 'Eliminar',
+        'SELECCIONAR': 'SELECCIONAR',
+
+
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+        'Actualización': 'Actualización',
+      };
+    } else {
+      translations = {
+        'TIPO DE PEDIDO': 'ORDER TYPE : '  ,
+        'DEPOSITO': 'STORAGE : '   ,
+        'MONEDA': 'COIN : ',
+        'CODIGO': 'CODE',
+        'CANTIDAD': 'QUANTITY',
+        'CONTINUAR': 'CONTINUE',
+        'PRODUCTO': 'PRODUCT',
+        'Confirmar acción': 'Confirm Action',
+        '¿Qué acción deseas realizar?': 'What action do you want to take?',
+        'Enviar': 'Send',
+        'Eliminar': 'Delete',
+        'SELECCIONAR': 'SELECT',
+
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+        'Actualización': 'Update',
+      };
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          flexibleSpace: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
-                  colors: <Color>[
-                    Color.fromRGBO(102, 45, 145, 30),
-                    Color.fromRGBO(212, 20, 90, 50),
-                  ],
-                ),
-              )
-          ),
-          title: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Column(
-              children: [
-                SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            SizedBox(width: 10),
-                            Text(
-                              clienteGlobal,
-                              style: TextStyle(
-                                color: Color.fromRGBO(212, 20, 90, 1),
-                                fontSize: 10,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Text(
-                              razonSocialGlobal,
-                              style: TextStyle(
-                                color: Color.fromRGBO(102, 45, 145, 1),
-                                fontSize: 10,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            // SizedBox(width: 10),
-                          ],
-                        ),
-                      ),
+          appBar: AppBar(
+            flexibleSpace: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.centerRight,
+                    end: Alignment.centerLeft,
+                    colors: <Color>[
+                      Color.fromRGBO(102, 45, 145, 30),
+                      Color.fromRGBO(212, 20, 90, 50),
                     ],
                   ),
+                )
+            ),
+            title: Container(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              child: Column(
+                children: [
+                  SizedBox(height: 15), // Espaciado entre la primera fila y la segunda
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Row(
+                            children: [
+                              SizedBox(width: 10),
+                              Text(
+                                clienteGlobal,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(212, 20, 90, 1),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                razonSocialGlobal,
+                                style: TextStyle(
+                                  color: Color.fromRGBO(102, 45, 145, 1),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              // SizedBox(width: 10),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
 
-                ),
-                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
-                Container(
-                  decoration: BoxDecoration(
-                    color: Color.fromRGBO(212, 20, 90, 1),
-                    borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  child: Text(
-                    correoGlobal,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
+                  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(212, 20, 90, 1),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: Text(
+                      correoGlobal,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+            ),
+            bottom: PreferredSize(
+              preferredSize: Size.fromHeight(20.0),
+              child: const SizedBox(),
             ),
           ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(20.0),
-            child: const SizedBox(),
-          ),
-        ),
-        drawer: Drawer(
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.transparent, // Establece el fondo del Drawer como transparente
-            ),
-            width: MediaQuery.of(context).size.width / 8, // Define el ancho deseado (1/4 de la pantalla)
-            child: ListView(
-              children: [
-                DrawerHeader(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerRight,
-                      end: Alignment.centerLeft,
-                      colors: <Color>[
-                        Color.fromRGBO(102, 45, 145, 30),
-                        Color.fromRGBO(212, 20, 90, 50),
+          drawer: Drawer(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.transparent, // Establece el fondo del Drawer como transparente
+              ),
+              width: MediaQuery.of(context).size.width / 8, // Define el ancho deseado (1/4 de la pantalla)
+              child: ListView(
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.centerRight,
+                        end: Alignment.centerLeft,
+                        colors: <Color>[
+                          Color.fromRGBO(102, 45, 145, 30),
+                          Color.fromRGBO(212, 20, 90, 50),
+                        ],
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          'images/nombre2.png',
+                          width: 150,
+                          height: 70,
+                        ),
+                        Text(
+                          '\nQTM - VENTA  DIRECTA\n\n',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.white,
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  child: Column(
-                    children: [
-                      Image.asset(
-                        'images/nombre2.png',
-                        width: 150,
-                        height: 70,
+                  ListTile(
+                    leading: Icon(Icons.person),
+                    title: Text(
+                      translations['Cliente'] ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),),
+                    selected: _selectedIndex == 0,
+                    onTap: () {
+                      _onMenuItemSelected(0);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.mail),
+                    title: Text(' Mail',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
                       ),
-                      Text(
-                        '\nQTM - VENTA  DIRECTA\n\n',
-                        style: TextStyle(
-                          fontSize: 11,
-                          color: Colors.white,
-                        ),
+                    ),
+                    selected: _selectedIndex == 1,
+                    onTap: () {
+                      _onMenuItemSelected(1);
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.checklist,
+                      color: Colors.grey, // Cambia el color del icono
+                    ),
+                    title: Text(
+                      translations['Pedidos'] ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
                       ),
-                    ],
-                  ),
-                ),
-                ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text('Cliente',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
-                    ),),
-                  selected: _selectedIndex == 0,
-                  onTap: () {
-                    _onMenuItemSelected(0);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.mail),
-                  title: Text(' Mail',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
                     ),
+                    selected: _selectedIndex == 2,
+                    onTap: () {
+                      _onMenuItemSelected(2);
+                    },
                   ),
-                  selected: _selectedIndex == 1,
-                  onTap: () {
-                    _onMenuItemSelected(1);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.checklist,
-                    color: Colors.grey, // Cambia el color del icono
-                  ),
-                  title: Text('Pedidos',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
+                  ListTile(
+                    leading: Icon(Icons.monetization_on,
+                      color: Colors.grey, // Cambia el color del icono
                     ),
-                  ),
-                  selected: _selectedIndex == 2,
-                  onTap: () {
-                    _onMenuItemSelected(2);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.monetization_on,
-                    color: Colors.grey, // Cambia el color del icono
-                  ),
-                  title: Text('Cobranza',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
+                    title: Text(
+                      translations['Cobranza'] ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),
                     ),
+                    selected: _selectedIndex == 3,
+                    onTap: () {
+                      _onMenuItemSelected(3);
+                    },
                   ),
-                  selected: _selectedIndex == 3,
-                  onTap: () {
-                    _onMenuItemSelected(3);
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.settings,
-                    color: Colors.grey, // Cambia el color del icono
-                  ),
-                  title: Text('Configuración',
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.black,
+                  ListTile(
+                    leading: Icon(Icons.settings,
+                      color: Colors.grey, // Cambia el color del icono
                     ),
+                    title: Text(
+                      translations['Configuración'] ?? '',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),
+                    ),
+                    selected: _selectedIndex == 4,
+                    onTap: () {
+                      _onMenuItemSelected(4);
+                    },
                   ),
-                  selected: _selectedIndex == 3,
-                  onTap: () {
-                    _onMenuItemSelected(3);
-                  },
-                ),
 
-              ],
+                ],
+              ),
             ),
           ),
-        ),
           body:
           Container(
               padding: const EdgeInsets.all(10.0),
@@ -544,7 +602,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'TIPO DE PEDIDO: ',
+                              text:
+                              translations['TIPO DE PEDIDO'] ?? '',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -568,7 +627,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'DEPOSITO: ',
+                              text:
+                              translations['DEPOSITO'] ?? '',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -592,7 +652,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                           ),
                           children: [
                             TextSpan(
-                              text: 'MONEDA: ',
+                              text:
+                              translations['MONEDA'] ?? '',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -618,7 +679,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                             child: TextField(
                               controller: _codigoController ,
                               decoration: InputDecoration(
-                                labelText: 'CÓDIGO',
+                                labelText:
+                                translations?['CODIGO'] ?? '',
                                 border: OutlineInputBorder(),
                               ),
                             ),
@@ -687,7 +749,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                         controller: _cantidadController  ,
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
-                          labelText: 'CANTIDAD',
+                          labelText:
+                          translations?['CANTIDAD'] ?? '',
                           border: OutlineInputBorder(),
                         ),
                       ),
@@ -699,7 +762,9 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                         _continuar();
                         setState(() {}); // Redibuja la interfaz después de agregar elementos a listaPedido
                       },
-                      child: Text('  Continuar  '),
+                      child: Text(
+                        translations?['CONTINUAR'] ?? '',
+                      ),
                       style: ButtonStyle(
                         backgroundColor: MaterialStateProperty.resolveWith<Color>(
                               (Set<MaterialState> states) {
@@ -764,7 +829,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                                   ),
                                                   children: [
                                                     TextSpan(
-                                                      text: 'CÓDIGO: ',
+                                                      text:
+                                                      translations?['CODIGO'] ?? '',
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                       ),
@@ -783,7 +849,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                                   ),
                                                   children: [
                                                     TextSpan(
-                                                      text: 'PRODUCTO: ',
+                                                      text:
+                                                      translations?['PRODUCTO'] ?? '',
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                       ),
@@ -805,7 +872,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                                   ),
                                                   children: [
                                                     TextSpan(
-                                                      text: 'CANTIDAD: ',
+                                                      text:
+                                                      translations?['CANTIDAD'] ?? '',
                                                       style: TextStyle(
                                                         fontWeight: FontWeight.bold,
                                                       ),
@@ -838,8 +906,12 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                           context: context,
                           builder: (BuildContext context) {
                             return AlertDialog(
-                              title: Text('Confirmar acción'),
-                              content: Text('¿Qué acción deseas realizar?'),
+                              title: Text(
+                                translations?['Confirmar acción'] ?? '',
+                              ),
+                              content: Text(
+                                translations?['¿Qué acción deseas realizar?'] ?? '',
+                              ),
                               actions: [
                                 TextButton(
                                   onPressed: () {
@@ -848,13 +920,9 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                     setState(() {}); // Redibuja la interfaz después de enviar elementos a listaPedido
 
                                   },
-                                  child: Text('Enviar'),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text('Modificar'),
+                                  child: Text(
+                                    translations?['Enviar'] ?? '',
+                                  ),
                                 ),
                                 TextButton(
                                   onPressed: () {
@@ -862,7 +930,9 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                     Navigator.of(context).pop();
                                     setState(() {}); // Redibuja la interfaz después de eliminar elementos a listaPedido
                                   },
-                                  child: Text('Eliminar'),
+                                  child: Text(
+                                    translations?['Eliminar'] ?? '',
+                                  ),
                                 ),
                               ],
                             );
@@ -870,7 +940,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                         );
                       }
                           : null,
-                      child: Text('      SELECCIONAR      ',
+                      child: Text(
+                        translations?['SELECCIONAR'] ?? '',
                         style: TextStyle(
                           color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
                         ),),

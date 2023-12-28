@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../Herramientas/boton.dart';
 import '../Herramientas/global.dart';
 import '../Herramientas/variables_globales.dart';
+import 'actualizacion.dart';
 
 class ClienteNuevo extends StatefulWidget {
   const ClienteNuevo({Key? key}) : super(key: key);
@@ -71,6 +73,81 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       },
     );
   }
+
+  Widget buildDropdown(EstadoModel estadoModel) {
+    return estadoModel.estadosNombres.isNotEmpty
+        ? Container(
+      margin: EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Text(
+            'ESTADO     ',
+            style: TextStyle(
+              color: Color.fromRGBO(102, 45, 145, 30),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: DropdownButton<String>(
+              value: _selectedEstado ?? estadoModel.estadosNombres[0],
+              items: estadoModel.estadosNombres.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedEstado = newValue; // Actualiza el estado seleccionado
+                });
+              },
+            ),
+          ),
+        ],
+      ),
+    )
+        : Container(
+      margin: EdgeInsets.only(bottom: 10),
+      child: Row(
+        children: [
+          Text(
+            'ESTADO     ',
+            style: TextStyle(
+              color: Color.fromRGBO(102, 45, 145, 30),
+              fontSize: 14,
+              fontWeight: FontWeight.normal,
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: TextFormField(
+              controller: TextEditingController(text: _selectedEstado ?? ''),
+              decoration: InputDecoration(
+                hintText: 'Selecciona un estado',
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    // Lógica para mostrar la lista de estados
+                    // Puedes llamar a un método para mostrar la lista aquí
+                  },
+                  icon: Icon(Icons.arrow_drop_down),
+                ),
+              ),
+              readOnly: true,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   //campo de estado
   Widget buildEstadoDropdown() {
@@ -198,6 +275,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
 
     }*/
 
+
     var url = Uri.parse(baseUrl + api);
     final body = jsonEncode({
       "username" :usuarioGlobal,
@@ -262,7 +340,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     }
   }
 
-  Widget buildDropdown(String label, List<Map<String, String>> items, String selectedValue) {
+ /* Widget buildDropdown(String label, List<Map<String, String>> items, String selectedValue) {
     return Row(
       children: [
         Text(
@@ -292,6 +370,58 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
         ),
       ],
     );
+  }*/
+
+  late Map<String, String> translations = {};
+  @override
+  void initState() {
+    super.initState();
+    // Acceder al modelo de estado
+    final estadoModel = Provider.of<EstadoModel>(context, listen: false);
+
+    // Verificar si hay datos en estadosNombres
+    if (estadoModel.estadosNombres.isEmpty) {
+      print("esta vacio");
+      // Si no hay datos, llamar a cargarEstados desde actualización layout
+      cargarEstados();
+    }else{
+      print("estadosNombres: ${estadoModel.estadosNombres}");
+      //  print("selectedEstado: ${estadoModel.selectedEstado}");
+    }
+    if (isEnglish) {
+      translations = {
+        'Razon  Social': 'RAZÓN       \nSOCIAL',
+        'DIRECCION': 'DIRECCION',
+        'ESTADO': 'ESTADO',
+        'CODIGO POSTAL': 'CODIGO\n POSTAL',
+        'TELEFONO FIJO': 'TELEFONO\n FIJO',
+        'TELEFONO NUMERO': 'TELEFONO\n NUMERO',
+        'CONFIRMAR': 'CONFIRMAR',
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+      };
+    } else {
+      translations = {
+        'Razon  Social': 'COMPANY \nNAME ',
+        'DIRECCION': 'ADRESS     ',
+        'ESTADO': 'STATE',
+        'CODIGO POSTAL': 'ZIP CODE   ',
+        'TELEFONO FIJO': 'LANDLINE  \nPHONE',
+        'TELEFONO NUMERO': '   PHONE    \n NUMBER',
+        'CONFIRMAR': 'CONFIRM',
+
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+      };
+    }
   }
 
   void _onMenuItemSelected(int index) {
@@ -319,12 +449,12 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     }
   }
 
-  @override
+ /* @override
   void initState() {
     super.initState();
     cargarEstados();
     estadoValue = estados.isNotEmpty ? estados[0]["Estado"] : null;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -411,7 +541,8 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Cliente',
+                  title: Text(
+                    translations['Cliente'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -438,7 +569,8 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                   leading: Icon(Icons.checklist,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Pedidos',
+                  title: Text(
+                    translations['Pedidos'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -453,7 +585,8 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                   leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text(
+                    translations['Cobranza'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -468,15 +601,16 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text(
+                    translations['Configuración'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 3,
+                  selected: _selectedIndex == 4,
                   onTap: () {
-                    _onMenuItemSelected(3);
+                    _onMenuItemSelected(4);
                   },
                 ),
 
@@ -501,13 +635,19 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           buildTextField("CUIT           ", "CUIT", cuitController ),
-                          buildTextField("RAZÓN       \nSOCIAL", "RAZÓN SOCIAL", razonSocialController ),
-                          buildTextField("DIRECCIÓN", "DIRECCIÓN", direccionController ),
+                          buildTextField( translations['Razon  Social'] ?? '',
+                              translations['Razon  Social'] ?? '', razonSocialController ),
+                          buildTextField(translations['DIRECCION'] ?? '',
+                              translations['DIRECCION'] ?? '', direccionController ),
                           buildEstadoDropdown(), // Campo de texto para el estado
-                          buildTextField("CÓDIGO      \nPOSTAL", "CÓDIGO POSTAL", codigoPostalController ),
-                          buildTextField("TÉLEFONO \nPÉFIJO", "TÉLEFONO PÉFIJO", telefonoPrefijoController ),
-                          buildTextField("TÉLEFONO \nNÚMERO", "TÉLEFONO NÚMERO", telefonoNumeroController ),
-                          buildTextField("MAIL           ", "CORREO", correoController ),
+                          buildTextField(translations['CODIGO POSTAL'] ?? '',
+                              translations['CODIGO POSTAL'] ?? '',codigoPostalController ),
+                          buildTextField(translations['TELEFONO FIJO'] ?? '',
+                              translations['TELEFONO FIJO'] ?? '', telefonoPrefijoController ),
+                          buildTextField(translations['TELEFONO NUMERO'] ?? '',
+                              translations['TELEFONO NUMERO'] ?? '', telefonoNumeroController ),
+                          buildTextField("MAIL            ",
+                              "MAIL", correoController ),
                         ],
                       ),
                     ),
@@ -522,8 +662,9 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
                     Expanded(
                       child: MyElevatedButton(
                         onPressed: generarCliente,
-                        child: Text('CONFIRMAR'),
-                      ),
+                        child: Text(
+                          translations['CONFIRMAR'] ?? '',
+                        ), ),
                     ),
                   ],
                 ),

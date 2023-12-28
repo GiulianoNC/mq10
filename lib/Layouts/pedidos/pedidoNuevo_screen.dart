@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mq10/Herramientas/global.dart';
 import 'package:mq10/Layouts/pedidos/pedidoNuevo2_screen.dart';
+import 'package:provider/provider.dart';
 
 import '../../Herramientas/boton.dart';
 import '../../Herramientas/variables_globales.dart';
+import '../actualizacion.dart';
 
 
 class PedidoNuevo extends StatefulWidget {
@@ -57,12 +59,51 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
         break;
     }
   }
+  late Map<String, String> translations = {};
 
   @override
   void initState() {
     super.initState();
     // Realizar solicitudes para obtener las opciones de los menús
-    fetchMenuOptions();
+    final pedidoModel = Provider.of<PedidoModel>(context, listen: false);
+
+    // Verificar si hay datos disponibles en el provider
+    if (pedidoModel.menu1Options != null &&
+        pedidoModel.menu2Options != null &&
+        pedidoModel.menu3Options != null) {
+      // Si hay datos en el provider, utilizar esos datos
+      setState(() {
+        menu1Options = pedidoModel.menu1Options;
+        menu2Options = pedidoModel.menu2Options;
+        menu3Options = pedidoModel.menu3Options;
+      });
+    } else {
+      // Si no hay datos en el provider, realizar las solicitudes para obtener los menús
+      fetchMenuOptions();
+    }
+    if (isEnglish) {
+      translations = {
+        'CONFIRMAR': 'CONFIRMAR',
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+        'Actualización': 'Actualización',
+      };
+    } else {
+      translations = {
+        'CONFIRMAR': 'CONFIRM',
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+        'Actualización': 'Update',
+      };
+    }
   }
 
   Future<void> fetchMenuOptions() async {
@@ -172,7 +213,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                         padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: Row(
                           children: [
@@ -202,11 +243,11 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   ),
 
                 ),
-                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+                SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(212, 20, 90, 1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
@@ -263,7 +304,8 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Cliente',
+                  title: Text(
+                    translations['Cliente'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -290,7 +332,8 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   leading: Icon(Icons.checklist,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Pedidos',
+                  title: Text(
+                    translations['Pedidos'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -305,7 +348,8 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text(
+                    translations['Cobranza'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -320,17 +364,19 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text(
+                    translations['Configuración'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 3,
+                  selected: _selectedIndex == 4,
                   onTap: () {
-                    _onMenuItemSelected(3);
+                    _onMenuItemSelected(4);
                   },
                 ),
+
               ],
             ),
           ),
@@ -429,7 +475,9 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                   }).toList(),
                 ),
               ),
-              const Spacer(), // Agregar un Spacer para empujar el botón hacia abajo
+              //const Spacer(), // Agregar un Spacer para empujar el botón hacia abajo
+              SizedBox(height: 130),
+
               Align(
                 alignment: Alignment.bottomCenter,
                 child: MyElevatedButton(
@@ -445,7 +493,9 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
-                          child: const Text('CONFIRMAR', textAlign: TextAlign.center),
+                          child:  Text(
+                              translations['CONFIRMAR'] ?? '',
+                              textAlign: TextAlign.center),
                         ),
                         if (loading) CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)
                       ],

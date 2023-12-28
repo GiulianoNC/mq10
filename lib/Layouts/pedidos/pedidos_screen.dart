@@ -85,11 +85,46 @@ class _PedidosState extends State<Pedidos> {
     }
   }
 
+  late Map<String, String> translations = {};
 
   @override
   void initState() {
     super.initState();
     fetchData(); // Llama a fetchData solo una vez cuando el widget se inicia
+    if (isEnglish) {
+      translations = {
+        'Fecha de Orden': 'Fecha de Orden :',
+        'Razon  Social': 'Razón  Social : ',
+        'NRO_ORDEN': 'NRO_ORDEN : ',
+        'NRO_LINEA': 'NRO_LINEA :',
+        ' CANCELAR': 'CANCELAR',
+        'NUEVO': 'NUEVO',
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+        'Actualización': 'Actualización',
+      };
+    } else {
+      translations = {
+        'Fecha de Orden': 'Order Date : ',
+        'Razon  Social': 'Company  Name :',
+        'NRO_ORDEN': 'ORDER_NUMBER :',
+        'NRO_LINEA': 'LINE_NUMBER : ',
+        ' CANCELAR': 'CANCEL',
+        'NUEVO': 'NEW',
+
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+        'Actualización': 'Update',
+      };
+    }
   }
 
   @override
@@ -123,7 +158,7 @@ class _PedidosState extends State<Pedidos> {
                               padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(5),
                               ),
                               child: Row(
                                 children: [
@@ -153,11 +188,11 @@ class _PedidosState extends State<Pedidos> {
                         ),
 
                       ),
-                      //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+                        SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                       Container(
                         decoration: BoxDecoration(
                           color: Color.fromRGBO(212, 20, 90, 1),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                         child: Text(
@@ -214,8 +249,8 @@ class _PedidosState extends State<Pedidos> {
                       ),
                       ListTile(
                         leading: Icon(Icons.person),
-                        title:
-                        Text('Cliente',
+                        title: Text(
+                          translations['Cliente'] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.black,
@@ -242,7 +277,8 @@ class _PedidosState extends State<Pedidos> {
                         leading: Icon(Icons.checklist,
                           color: Colors.grey, // Cambia el color del icono
                         ),
-                        title: Text('Pedidos',
+                        title: Text(
+                          translations['Pedidos'] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.black,
@@ -253,12 +289,12 @@ class _PedidosState extends State<Pedidos> {
                           _onMenuItemSelected(2);
                         },
                       ),
-
                       ListTile(
                         leading: Icon(Icons.monetization_on,
                           color: Colors.grey, // Cambia el color del icono
                         ),
-                        title: Text('Cobranza',
+                        title: Text(
+                          translations['Cobranza'] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.black,
@@ -273,15 +309,16 @@ class _PedidosState extends State<Pedidos> {
                         leading: Icon(Icons.settings,
                           color: Colors.grey, // Cambia el color del icono
                         ),
-                        title: Text('Configuración',
+                        title: Text(
+                          translations['Configuración'] ?? '',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.black,
                           ),
                         ),
-                        selected: _selectedIndex == 3,
+                        selected: _selectedIndex == 4,
                         onTap: () {
-                          _onMenuItemSelected(3);
+                          _onMenuItemSelected(4);
                         },
                       ),
 
@@ -329,7 +366,8 @@ class _PedidosState extends State<Pedidos> {
                                         ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'Fecha de Orden: ',
+                                              text:
+                                              translations['Fecha de Orden'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -346,7 +384,8 @@ class _PedidosState extends State<Pedidos> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'Razón Social: ',
+                                              text:
+                                              translations['Razon  Social'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -363,7 +402,8 @@ class _PedidosState extends State<Pedidos> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'NRO_ORDEN: ',
+                                              text:
+                                              translations['NRO_ORDEN'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -380,7 +420,8 @@ class _PedidosState extends State<Pedidos> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'NRO_LINEA: ',
+                                              text:
+                                              translations['NRO_LINEA'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -436,18 +477,42 @@ class _PedidosState extends State<Pedidos> {
     );
   }
 }
+
 class BottomSheetButtons extends StatelessWidget {
   final List<dynamic> items;
   final Set<int> selectedItems;
   final void Function(bool value) setLoading; // Función para cambiar el estado de carga
   final bool isLoading; // Variable para controlar el estado de carga
+  late Map<String, String> translations = {};
+
 
   BottomSheetButtons({
     required this.items,
     required this.selectedItems,
     required this.setLoading,
     required this.isLoading, // Agrega isLoading al constructor
-  });
+  }){
+    // Asigna las traducciones según el idioma
+    if (isEnglish) {
+      translations = {
+        'CANCELAR': 'CANCELAR',
+        'NUEVO': 'NUEVO',
+        'Confirmar Cancelación': 'Confirmar Cancelación',
+        '¿Está seguro de cancelar los pedidos seleccionados?': '¿Está seguro de cancelar los pedidos seleccionados?',
+        'SI': 'SI',
+        'NO': 'NO',
+      };
+    } else {
+      translations = {
+        'CANCELAR': 'CANCEL',
+        'NUEVO': '  NEW   ',
+        'Confirmar Cancelación': 'Confirm Cancellation',
+        '¿Está seguro de cancelar los pedidos seleccionados?': 'Are you sure about canceling selected orders?',
+        'SI': 'YES',
+        'NO': 'NO',
+      };
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -463,10 +528,14 @@ class BottomSheetButtons extends StatelessWidget {
                   context: context,
                   builder: (BuildContext context) {
                     return AlertDialog(
-                      title: Text('Confirmar Cancelación'),
+                      title: Text(
+                        translations['Confirmar Cancelación'] ?? '',
+                      ),
                       content: isLoading
                           ? CircularProgressIndicator()
-                          : Text('¿Está seguro de cancelar los pedidos seleccionados?'),
+                          : Text(
+                        translations['¿Está seguro de cancelar los pedidos seleccionados?'] ?? '',
+                      ),
                       actions: <Widget>[
                         if (!isLoading)
                           TextButton(
@@ -476,7 +545,9 @@ class BottomSheetButtons extends StatelessWidget {
                             },
                           ),
                         TextButton(
-                          child: Text('SI'),
+                          child: Text(
+                            translations['SI'] ?? '',
+                          ),
                           onPressed: () async {
                             // Agrega este print para verificar selectedItems antes de la lógica de cancelación
                             print("selectedItems before cancellation: $selectedItems");
@@ -545,7 +616,7 @@ class BottomSheetButtons extends StatelessWidget {
                   },
                 );
               },
-              child: Text('   CANCELAR    '),
+            child: Text(translations['CANCELAR'] ?? 'CANCELAR'), // Traducción para 'CANCELAR'
             style: ButtonStyle(
               backgroundColor: MaterialStateProperty.resolveWith<Color>(
                     (Set<MaterialState> states) {
@@ -568,7 +639,8 @@ class BottomSheetButtons extends StatelessWidget {
                 // Agrega aquí la lógica para el botón "NUEVO"
                 navigateToIncidenteScreen(context);
               },
-              child: Text('      NUEVO      ',
+              child: Text(
+                translations['NUEVO'] ?? '',
               style: TextStyle(
                 color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
               ),),

@@ -130,6 +130,8 @@ class _actualizacionState extends State<actualizacion> {
     }
   }
 
+  int completedRequests = 0;
+
   Future<void> fetchMenuOptions() async {
     setState(() {
       isLoadingEstados = true; // Mostrar el indicador de carga
@@ -153,9 +155,8 @@ class _actualizacionState extends State<actualizacion> {
         Provider.of<PedidoModel>(context, listen: false)
             .actualizarOpcionesMenu1(data1['MQ10X1A_FORMREQ_1'] as List<dynamic>);
         print('datosss');
-        setState(() {
-          isLoadingPedidos = false;
-        });
+        completedRequests++;
+
 
       } else {
         throw Exception('Failed to load data for Menu 1');
@@ -179,6 +180,7 @@ class _actualizacionState extends State<actualizacion> {
         Provider.of<PedidoModel>(context, listen: false)
             .actualizarOpcionesMenu2(data2['MQ10X3A_DATAREQ'] as List<dynamic>);
         print('datosss');
+        completedRequests++;
 
       } else {
         throw Exception('Failed to load data for Menu 2');
@@ -201,8 +203,13 @@ class _actualizacionState extends State<actualizacion> {
         final data3 = json.decode(response3.body);
         Provider.of<PedidoModel>(context, listen: false)
             .actualizarOpcionesMenu3(data3['MQ10X4A_DATAREQ']['rowset'] as List<dynamic>);
-        print('datosss');
+        completedRequests++;
 
+        if (completedRequests == 3) {
+          setState(() {
+            isLoadingPedidos = false;
+          });
+        }
       } else {
         throw Exception('Failed to load data for Menu 3');
       }
