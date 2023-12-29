@@ -217,10 +217,10 @@ class _LoginScreenState extends State<LoginScreen> {
       translations = {
         'Usuario': 'Username',
         'Contraseña': 'Password',
-        'Iniciar sesión': 'Sign In',
+        'Iniciar sesión': 'SIGN IN',
         'RECORDAR': 'REMEMBER',
         "COMPANIA": "COMPANY",
-        "MONEDA":"COIN",
+        "MONEDA":"CURRENCY",
         "ESTADO": "STATE",
         "ZONA": "ZONE",
         "BANCO": "BANK",
@@ -807,17 +807,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           child:   MyElevatedButton(
                             onPressed: ()  async {
                               // Verificar si los campos obligatorios están llenos
-                              if (direccion.isEmpty) {
+                              if (myController3.text.toString().isEmpty) {
                                 setState(() {
                                   isUrlValid = false;
                                 });
                               }
-                              if (compania.isEmpty) {
+                              if (myController4.text.toString().isEmpty) {
                                 setState(() {
                                   isCompaniaValid = false;
                                 });
                               }
-                              if (moneda.isEmpty) {
+                              if (myController5.text.toString().isEmpty) {
                                 setState(() {
                                   isMonedaValid = false;
                                 });
