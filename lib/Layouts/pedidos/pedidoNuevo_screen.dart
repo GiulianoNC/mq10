@@ -81,7 +81,7 @@ class _PedidoNuevoState extends State<PedidoNuevo> {
       // Si no hay datos en el provider, realizar las solicitudes para obtener los menús
       fetchMenuOptions();
     }
-    if (isEnglish) {
+    if (!isEnglish) {
       translations = {
         'CONFIRMAR': 'CONFIRMAR',
         //menu

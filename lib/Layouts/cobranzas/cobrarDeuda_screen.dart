@@ -155,6 +155,8 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
     );
   }
 
+  late Map<String, String> translations = {};
+
   @override
   void initState() {
     super.initState();
@@ -164,6 +166,43 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
     instrumendoPagoController = TextEditingController();
     bancoController = TextEditingController();
     numeroValorController = TextEditingController();
+    if (!isEnglish) {
+      translations = {
+        'IMPORTE A COBRAR': 'IMPORTE           \n A COBRAR',
+        'MONEDA': 'MONEDA            ',
+        'FECHA': 'FECHA                ',
+        'INSTRUMENTO DE PAGO': 'INSTRUMENTO  \n DE PAGO',
+        'BANCO': 'BANCO :               ',
+        'NÚMERO VALOR': 'NUMERO             \n VALOR',
+        'CONFIRMAR': 'CONFIRMAR',
+        'CANCELAR': 'CANCELAR',
+
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+      };
+    } else {
+      translations = {
+        'IMPORTE A COBRAR': 'AMOUNT         \nRECEIVABLE:',
+        'MONEDA': 'COIN                 ',
+        'FECHA': 'DATE                 ',
+        'INSTRUMENTO DE PAGO': 'PAYMENT        \n INSTRUMENT',
+        'BANCO': 'BANK               ',
+        'NÚMERO VALOR': 'VALUE             \n NUMBER',
+        'CONFIRMAR': 'CONFIRM',
+        'CANCELAR': 'CANCEL',
+
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+      };
+    }
   }
 
   //TENER LA FECHA ACTUAL E INSERTARLA
@@ -262,7 +301,7 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                         padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(5),
                         ),
                         child: Row(
                           children: [
@@ -292,11 +331,11 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                   ),
 
                 ),
-                //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+                SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
                 Container(
                   decoration: BoxDecoration(
                     color: Color.fromRGBO(212, 20, 90, 1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(5),
                   ),
                   padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                   child: Text(
@@ -353,7 +392,8 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Cliente',
+                  title: Text(
+                    translations['Cliente'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -380,7 +420,8 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                   leading: Icon(Icons.checklist,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Pedidos',
+                  title: Text(
+                    translations['Pedidos'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -391,12 +432,12 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                     _onMenuItemSelected(2);
                   },
                 ),
-
                 ListTile(
                   leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text(
+                    translations['Cobranza'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -411,18 +452,18 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text(
+                    translations['Configuración'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 3,
+                  selected: _selectedIndex == 4,
                   onTap: () {
-                    _onMenuItemSelected(3);
+                    _onMenuItemSelected(4);
                   },
                 ),
-
               ],
             ),
           ),
@@ -443,11 +484,18 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        buildTextField("IMPORTE           \n A COBRAR ", "IMPORTE A COBRAR", importeController),
-                        buildTextField("MONEDA            ", "MONEDA", monedaController),
-                        buildDateField("FECHA                ", fechaController),
-                        buildTextField("INSTRUMENTO \n DE PAGO           ",
-                          "INSTRUMENTO DE PAGO",
+                        buildTextField(
+                            translations['IMPORTE A COBRAR'] ?? '',
+                            "", importeController),
+                        buildTextField(
+                            translations['MONEDA'] ?? '',
+                            "", monedaController),
+                        buildDateField(
+                            translations['FECHA'] ?? '',
+                            fechaController),
+                        buildTextField(
+                          translations['INSTRUMENTO DE PAGO'] ?? '',
+                          "",
                           instrumendoPagoController,
                               () {
                             showDialog(
@@ -458,8 +506,9 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                             );
                           },
                         ),
-                        buildTextField("BANCO               ",
-                          "BANCO",
+                        buildTextField(
+                          translations['BANCO'] ?? '',
+                          "",
                           bancoController,
                               () {
                             showDialog(
@@ -471,8 +520,10 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                           },
                         ),
                         //   buildTextField("INSTRUMENTO \n DE PAGO           ", "INSTRUMENTO DE PAGO", instrumendoPagoController),
-                      //  buildTextField("BANCO           ", "BANCO", bancoController),
-                        buildTextField("NÚMERO           \n VALOR           ", "NÚMERO VALOR", numeroValorController),
+                        //  buildTextField("BANCO           ", "BANCO", bancoController),
+                        buildTextField(
+                            translations['NÚMERO VALOR'] ?? '',
+                            "", numeroValorController),
 
                       ],
                     ),
@@ -505,14 +556,14 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                           "Compania": companiaGlobal,
                           "Pagador": clienteGlobal,
                           "Moneda": monedaGlobal,
-                          "Fecha": "12/10/2023",
-                          //"Fecha": fechaController.text, // Obtener la fecha del controlador
+                          //"Fecha": "12/10/2023",
+                          "Fecha": fechaController.text, // Obtener la fecha del controlador
                           "NroValor": numeroValorController.text,
-                          "InstrumentoPago": "4",
-                          //"InstrumentoPago": instrumendoPagoController.text,
+                          //"InstrumentoPago": "4",
+                          "InstrumentoPago": instrumendoPagoController.text,
                           "Importe_valor": importeController.text,
-                        "Banco_valor": "999"
-                       // "Banco_valor": bancoController.text,
+                          // Banco_valor": "999"
+                          "Banco_valor": bancoController.text,
                         });
 
                         var response = await http.post(
@@ -568,7 +619,8 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                         }
                       },
 
-                      child: Text(' CONFIRMAR',
+                      child: Text(
+                        translations['CONFIRMAR'] ?? '',
                         style: TextStyle(
                           fontSize: 12,
                         ),),
@@ -594,7 +646,8 @@ class _cobrarDeudaState extends State<cobrarDeuda> {
                       onPressed: () {
                         // Lógica para cobrar anticipo
                       },
-                      child: Text('  CANCELAR',
+                      child: Text(
+                        translations['CANCELAR'] ?? '',
                         style: TextStyle(
                           color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
                           fontSize: 12,

@@ -192,48 +192,50 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
   }
+
   @override
   void initState() {
     super.initState();
     _loadSavedData(); // Cargar los datos al iniciar la aplicación
     // Inicializar las traducciones en el idioma por defecto (español, por ejemplo)
-    translations = {
-      'Usuario': 'Usuario',
-      'Contraseña': 'Contraseña',
-      'Iniciar sesión': 'Iniciar sesión',
-      'RECORDAR': 'RECORDAR',
-      "COMPANIA": "COMPANIA",
-      "MONEDA":"MONEDA",
-      "ESTADO": "ESTADO",
-      "ZONA": "ZONA",
-      "BANCO": "BANCO",
-      "INSTRUMENTO": "INSTRUMENTO",
-      "DEPOSITO": "DEPOSITO",
-      "CONFIRMAR": "CONFIRMAR"
-
-    };
+    if (languageCode == 'en') {
+      translations = {
+        'Usuario': 'Usuario',
+        'Contraseña': 'Contraseña',
+        'Iniciar sesión': 'Iniciar sesión',
+        'RECORDAR': 'RECORDAR',
+        "COMPANIA": "COMPANIA",
+        "MONEDA":"MONEDA",
+        "ESTADO": "ESTADO",
+        "ZONA": "ZONA",
+        "BANCO": "BANCO",
+        "INSTRUMENTO": "INSTRUMENTO",
+        "DEPOSITO": "DEPOSITO",
+        "CONFIRMAR": "CONFIRMAR"
+      };
+    } else {
+      translations = {
+        'Usuario': 'Username',
+        'Contraseña': 'Password',
+        'Iniciar sesión': 'Sign In',
+        'RECORDAR': 'REMEMBER',
+        "COMPANIA": "COMPANY",
+        "MONEDA":"COIN",
+        "ESTADO": "STATE",
+        "ZONA": "ZONE",
+        "BANCO": "BANK",
+        "INSTRUMENTO": "INSTRUMENT",
+        "DEPOSITO": "STORAGE",
+        "CONFIRMAR": "CONFIRM"
+      };
+    }
 
   }
+ String  languageCode = "en";
 
-  void _cambiarIdioma(String languageCode) {
+  void _cambiarIdioma( languageCode) {
     setState(() {
       if (languageCode == 'en') {
-        translations = {
-          'Usuario': 'Username',
-          'Contraseña': 'Password',
-          'Iniciar sesión': 'Sign In',
-          'RECORDAR': 'REMEMBER',
-          "COMPANIA": "COMPANY",
-          "MONEDA":"COIN",
-          "ESTADO": "STATE",
-          "ZONA": "ZONE",
-          "BANCO": "BANK",
-          "INSTRUMENTO": "INSTRUMENT",
-          "DEPOSITO": "STORAGE",
-          "CONFIRMAR": "CONFIRM"
-          // Add all English translations here
-        };
-      } else {
         translations = {
           'Usuario': 'Usuario',
           'Contraseña': 'Contraseña',
@@ -247,7 +249,21 @@ class _LoginScreenState extends State<LoginScreen> {
           "INSTRUMENTO": "INSTRUMENTO",
           "DEPOSITO": "DEPOSITO",
           "CONFIRMAR": "CONFIRMAR"
-          // Add all Spanish translations here
+        };
+      } else {
+        translations = {
+          'Usuario': 'Username',
+      'Contraseña': 'Password',
+      'Iniciar sesión': 'Sign In',
+      'RECORDAR': 'REMEMBER',
+      "COMPANIA": "COMPANY",
+      "MONEDA":"COIN",
+      "ESTADO": "STATE",
+      "ZONA": "ZONE",
+      "BANCO": "BANK",
+      "INSTRUMENTO": "INSTRUMENT",
+      "DEPOSITO": "STORAGE",
+      "CONFIRMAR": "CONFIRM"
         };
       }
     });

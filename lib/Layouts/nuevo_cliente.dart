@@ -248,7 +248,7 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     // Validación de campos obligatorios
     var cuitValue = cuitController.text; // Reemplaza cuitController con el controlador correcto
     var razonSocialValue = razonSocialController.text; // Reemplaza razonSocialController con el controlador correcto
-    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
+    late var api = "/jderest/v3/orchestrator/MQ1002A_ORCH";
 
     print(cuitValue + razonSocialValue);
 
@@ -275,28 +275,30 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
 
     }*/
 
+    print("razon$razonSocialController $cuit");
 
     var url = Uri.parse(baseUrl + api);
-    final body = jsonEncode({
+    final body = jsonEncode(
+        {
       "username" :usuarioGlobal,
       "password" : contraGlobal,
-      "Razon_Social": razonSocial,
-      "Tax_ID": cuit,
-      "Direccion1": direccion,
-      "Estado": estado,
-      "Codig_Postal": codigoPostal,
-      "Zona_Venta": "741",
-      "Tipo_NroLegal": "080",
-      "Clase_Contable": "NAC",
-      "Explicacion_Fiscal": "V",
-      "Area_Fiscal": "ARIVA21",
-      "Busqueda": "C",
-      "Correo" : correo,
-      "Telefono_Prefijo": telefonoPrefijo,
-      "Telefono_Numero": telefonoNumero,
-      "InstruccionEntrega1": "Preguntar por Adrian",
-      "InstruccionEntrega2": "Despues del mediodia",
-      "Programa_Ajuste": "PCR"
+          "Razon_Social": razonSocialController.text.toString(),
+          "Tax_ID": cuitController.text.toString(),
+          "Direccion1": direccionController.text.toString(),
+          "Estado": estado,
+          "Codig_Postal": codigoPostalController.text.toString(),
+          "Zona_Venta": "741",
+          "Tipo_NroLegal": "080",
+          "Clase_Contable": "NAC",
+          "Explicacion_Fiscal": "V",
+          "Area_Fiscal": "ARIVA21",
+          "Busqueda": "C",
+          "Correo" : correoController.text.toString(),
+          "Telefono_Prefijo": telefonoPrefijoController.text.toString(),
+          "Telefono_Numero": telefonoNumeroController.text.toString(),
+          "InstruccionEntrega1": "Preguntar por Adrian",
+          "InstruccionEntrega2": "Despues del mediodia",
+          "Programa_Ajuste": "PCR"
     });
 
     final headers = {
@@ -308,11 +310,16 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       final response = await http.post(url, body: body, headers: headers);
       final data = json.decode(response.body);
       //AGREGAR A GLOBALES
-      razonSocialGlobal = razonSocialController.text;
-      clienteGlobal = cuitController.text;
-      correoGlobal = correoController.text;
+      razonSocialGlobal = razonSocialController.text.toString();
+      correoGlobal = correoController.text.toString();
 
       if (response.statusCode == 200) {
+        if (data.containsKey('Pagador')) {
+          var pagadorValue = data['Pagador']; // Obtiene el valor de "Pagador"
+          print('El valor de Pagador es: $pagadorValue');
+          // Asigna el valor de "Pagador" a clienteGlobal
+          clienteGlobal = pagadorValue.toString();
+        }
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -388,14 +395,14 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       print("estadosNombres: ${estadoModel.estadosNombres}");
       //  print("selectedEstado: ${estadoModel.selectedEstado}");
     }
-    if (isEnglish) {
+    if (!isEnglish) {
       translations = {
         'Razon  Social': 'RAZÓN       \nSOCIAL',
         'DIRECCION': 'DIRECCION',
         'ESTADO': 'ESTADO',
-        'CODIGO POSTAL': 'CODIGO\n POSTAL',
-        'TELEFONO FIJO': 'TELEFONO\n FIJO',
-        'TELEFONO NUMERO': 'TELEFONO\n NUMERO',
+        'CODIGO POSTAL': 'CODIGO      \n POSTAL',
+        'TELEFONO FIJO': 'TELEFONO \n FIJO',
+        'TELEFONO NUMERO': 'TELEFONO \n NUMERO',
         'CONFIRMAR': 'CONFIRMAR',
         //menu
         'VENTA DIRECTA': 'VENTA DIRECTA',

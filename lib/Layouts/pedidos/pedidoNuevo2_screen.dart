@@ -22,8 +22,10 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
   TextEditingController _cantidadController = TextEditingController();
   String _dropdownValue = 'Selecciona una opción'; // Valor predeterminado
   List<Map<String, String>> listaPedido = [];
+  TextEditingController _productoController = TextEditingController();
 
   var baseUrl = direc;
+  Map<String, dynamic> data = {};
 
   // Lista para almacenar los índices de elementos seleccionados
   List<int> selectedIndices = [];
@@ -164,14 +166,14 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
         'Content-Type': 'application/json',
       },
       body: jsonEncode({
-    "username" : usuarioGlobal,
-    "password" : contraGlobal
+        "username" : usuarioGlobal,
+        "password" : contraGlobal
       }),
     );
 
 
     if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
+      data = jsonDecode(response.body);
       if (data.containsKey('MQ10X2A_DATAREQ')) {
         final items = data['MQ10X2A_DATAREQ'] as List<dynamic>;
         final descriptions = items.map((item) => item['Descripcion'] as String).toList();
@@ -199,9 +201,13 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
     String producto = _dropdownValue;
     String cantidad = _cantidadController.text;
 
+     producto = await buscarDescripcion(codigo);
+
+
     try {
-      if (codigo.isNotEmpty && producto.isNotEmpty && cantidad.isNotEmpty) {
+      if (codigo.isNotEmpty || producto.isNotEmpty && cantidad.isNotEmpty) {
         // Agrega los datos a la lista
+        setState(() {});
         listaPedido.add({
           'CÓDIGO': codigo,
           'PRODUCTO': producto,
@@ -211,6 +217,7 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
         // Limpia los controladores
         _codigoController.clear();
         _cantidadController.clear();
+        _productoController.clear();
 
         // Puedes imprimir la lista para verificar que se están almacenando correctamente
         print(listaPedido);
@@ -322,20 +329,115 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
     }
   }
 
+  //para insertar producto
+  Future<void> agregarPedido(String codigo, String producto, String cantidad) async {
+    try {
+      // Realizar el POST request
+      final url =  Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X2A_ORCH");
+
+      //final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X2A_ORCH');
+
+      final response = await http.post(
+        Uri.parse(baseUrl + "/jderest/v3/orchestrator/MQ10X2A_ORCH"),
+        headers: <String, String>{
+          "Authorization": autorizacionGlobal,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "username" : usuarioGlobal,
+          "password" : contraGlobal
+        }),
+      );
+
+      // Agrega los datos a la lista
+      listaPedido.add({
+        'CÓDIGO': codigo,
+        'PRODUCTO': producto,
+        'CANTIDAD': cantidad,
+      });
+
+      // Limpia los controladores
+      _codigoController.clear();
+      _cantidadController.clear();
+
+      // Puedes imprimir la lista para verificar que se están almacenando correctamente
+      print(listaPedido);
+    } catch (e) {
+      print('Excepción al agregar a la lista: $e');
+      // Manejar la excepción aquí, como mostrar un diálogo de error.
+    }
+  }
+
+  // Método para buscar y actualizar el producto basado en el código
+  void _buscarProducto() async {
+    String codigo = _codigoController.text;
+    // Realizar la lógica para buscar la descripción del código y asignarla al campo de producto
+    // Aquí debes implementar la lógica para obtener la descripción correspondiente al código
+    String descripcion = await buscarDescripcion(codigo); // Función  para buscar la descripción
+
+    setState(() {
+      _productoController.text = descripcion; // Asignar la descripción al campo de producto
+    });
+  }
+
+  // Método para buscar la descripción correspondiente al código
+  Future<String> buscarDescripcion(String codigo) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X2A_ORCH'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          "username": "sbasilico",
+          "password": "Silvio71"
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Analizar la respuesta JSON
+        Map<String, dynamic> data = json.decode(response.body);
+        List<dynamic> productos = data['MQ10X2A_DATAREQ'];
+
+        // Buscar el objeto correspondiente al código proporcionado
+        Map<String, dynamic>? productoEncontrado = productos.firstWhere(
+              (producto) => producto['Codigo'] == codigo,
+          orElse: () => null,
+        );
+
+        if (productoEncontrado != null) {
+          // Si se encuentra el código, retornar la descripción
+          return productoEncontrado['Descripcion'];
+        } else {
+          // Manejar el caso en el que no se encuentre el código
+          return 'Descripción no encontrada';
+        }
+      } else {
+        // Manejar errores en la respuesta del servidor
+        return 'Error en la solicitud';
+      }
+    } catch (e) {
+      // Manejar errores en la solicitud HTTP
+      return 'Error en la solicitud: $e';
+    }
+  }
+
   late Map<String, String> translations = {};
 
   void initState() {
     super.initState();
+    _codigoController.addListener(_buscarProducto);  // Asignar listener al controlador de código para buscar y actualizar producto
 
-    if (isEnglish) {
+
+    if (!isEnglish) {
       translations = {
-        'TIPO DE PEDIDO': 'TIPO DE PEDIDO',
-        'DEPOSITO': 'DEPOSITO',
-        'MONEDA': 'MONEDA',
+        'TIPO DE PEDIDO': 'TIPO DE PEDIDO : ',
+        'DEPOSITO': 'DEPOSITO : ',
+        'MONEDA': 'MONEDA :',
         'CODIGO': 'CODIGO',
-        'CANTIDAD': 'CANTIDAD',
+        'CANTIDAD': 'CANTIDAD  ',
         'CONTINUAR': 'CONTINUAR',
-        'PRODUCTO': 'PRODUCTO',
+        'PRODUCTO': 'PRODUCTO : ',
         'Confirmar acción': 'Confirmar acción',
         '¿Qué acción deseas realizar?': '¿Qué acción deseas realizar?',
         'Enviar': 'Enviar',
@@ -376,6 +478,8 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
       };
     }
   }
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -725,8 +829,13 @@ class _PedidoNuevo2State extends State<PedidoNuevo2> {
                                 onChanged: (String? newValue) {
                                   // Handle dropdown value change
                                   setState(() {
-
                                     _dropdownValue = newValue ?? ''; // Actualiza el valor seleccionado
+                                    // Buscar el elemento seleccionado en los datos obtenidos
+                                    final selectedItem = data['MQ10X2A_DATAREQ'].firstWhere((item) => item['Descripcion'] == _dropdownValue);
+                                    // Obtener el valor del campo de código del objeto seleccionado y asignarlo al controlador
+                                    _codigoController.text = selectedItem['Codigo'];
+                                    _productoController.text = selectedItem['Descripcion'];
+
                                   });
                                 },
                               );

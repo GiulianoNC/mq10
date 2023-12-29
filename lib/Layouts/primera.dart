@@ -269,7 +269,7 @@ class _PrimeraState extends State<Primera> {
       //mostrarOpcionesDeCliente(data);
       print("hay datos$data");
     }
-    if (isEnglish) {
+    if (!isEnglish) {
       translations = {
         'ALTA CLIENTE': 'ALTA CLIENTE',
         'Razon  Social': 'Razon  Social',
@@ -292,7 +292,7 @@ class _PrimeraState extends State<Primera> {
         'ACEPTAR': 'ACEPT',
         'NUEVO': 'NEW',
        ' BUSCAR': 'SEARCH',
-         'Razon Social y CUIT': 'Comapany Name and CUIT',
+         'Razon Social y CUIT': 'Company Name and CUIT',
 
         //menu
         'VENTA DIRECTA': 'DIRECT SELLING',

@@ -31,12 +31,47 @@ class _CobranzaState extends State<Cobranza> {
     item['Local_bruto'] == mapToCheck['Local_bruto'] &&
         item['Local_Pendiente'] == mapToCheck['Local_Pendiente']);
   }
+  late Map<String, String> translations = {};
 
   @override
   void initState() {
     super.initState();
     _futureData = fetchData();
     print(monedaGlobal);
+    if (!isEnglish) {
+      translations = {
+        'CÓDIGO': 'CÓDIGO',
+        'TOTAL PENDIENTE': 'TOTAL PENDIENTE',
+        'TOTAL FORANEO': 'TOTAL FORANEO',
+        'PENDIENTE FORANEO': 'PENDIENTE FORANEO',
+        'PENDIENTE': 'PENDIENTE : ',
+        'COBRAR DEUDA': 'COBRAR DEUDA',
+        'COBRAR ANTICIPO': 'COBRAR ANTICIPO',
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+      };
+    } else {
+      translations = {
+        'CÓDIGO': 'CODE : ',
+        'TOTAL PENDIENTE': 'TOTAL PENDING ',
+        'TOTAL FORANEO': 'TOTAL FOREIGN ',
+        'PENDIENTE FORANEO': 'PENDING FOREIGN',
+        'PENDIENTE': 'PENDING :',
+        'COBRAR DEUDA': 'COLLECT DEBT',
+        'COBRAR ANTICIPO': 'COLLECT ADVANCE',
+
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+      };
+    }
   }
 
   Future<List<Map<String, dynamic>>> fetchData() async {
@@ -174,7 +209,7 @@ class _CobranzaState extends State<Cobranza> {
                       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 0),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(5),
                       ),
                       child: Row(
                         children: [
@@ -204,11 +239,11 @@ class _CobranzaState extends State<Cobranza> {
                 ),
 
               ),
-              //  SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
+              SizedBox(height: 5), // Espaciado entre la primera fila y la segunda
               Container(
                 decoration: BoxDecoration(
                   color: Color.fromRGBO(212, 20, 90, 1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(5),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                 child: Text(
@@ -229,9 +264,10 @@ class _CobranzaState extends State<Cobranza> {
       ),
       drawer: Drawer(
         child: Container(
-          decoration: BoxDecoration(
+          color: Colors.white, // Establece el color de fondo del Drawer como blanco
+         /* decoration: BoxDecoration(
             color: Colors.transparent, // Establece el fondo del Drawer como transparente
-          ),
+          ),*/
           width: MediaQuery.of(context).size.width / 8, // Define el ancho deseado (1/4 de la pantalla)
           child: ListView(
             children: [
@@ -264,8 +300,11 @@ class _CobranzaState extends State<Cobranza> {
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.person),
-                title: Text('Cliente',
+                leading: Icon(Icons.person,
+                  color: Colors.grey, // Cambia el color del icono
+                ),
+                title: Text(
+                  translations['Cliente'] ?? '',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black,
@@ -276,7 +315,9 @@ class _CobranzaState extends State<Cobranza> {
                 },
               ),
               ListTile(
-                leading: Icon(Icons.mail),
+                leading: Icon(Icons.mail,
+                  color: Colors.grey, // Cambia el color del icono
+                ),
                 title: Text(' Mail',
                   style: TextStyle(
                     fontSize: 15,
@@ -292,7 +333,8 @@ class _CobranzaState extends State<Cobranza> {
                 leading: Icon(Icons.checklist,
                   color: Colors.grey, // Cambia el color del icono
                 ),
-                title: Text('Pedidos',
+                title: Text(
+                  translations['Pedidos'] ?? '',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black,
@@ -303,12 +345,12 @@ class _CobranzaState extends State<Cobranza> {
                   _onMenuItemSelected(2);
                 },
               ),
-
               ListTile(
                 leading: Icon(Icons.monetization_on,
                   color: Colors.grey, // Cambia el color del icono
                 ),
-                title: Text('Cobranza',
+                title: Text(
+                  translations['Cobranza'] ?? '',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black,
@@ -323,18 +365,18 @@ class _CobranzaState extends State<Cobranza> {
                 leading: Icon(Icons.settings,
                   color: Colors.grey, // Cambia el color del icono
                 ),
-                title: Text('Configuración',
+                title: Text(
+                  translations['Configuración'] ?? '',
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.black,
                   ),
                 ),
-                selected: _selectedIndex == 3,
+                selected: _selectedIndex == 4,
                 onTap: () {
-                  _onMenuItemSelected(3);
+                  _onMenuItemSelected(4);
                 },
               ),
-
             ],
           ),
         ),
@@ -407,7 +449,8 @@ class _CobranzaState extends State<Cobranza> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'CÓDIGO: ',
+                                              text:
+                                              translations['CÓDIGO'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -425,7 +468,8 @@ class _CobranzaState extends State<Cobranza> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'TOTAL: ',
+                                              text:
+                                              'TOTAL: ',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -448,11 +492,13 @@ class _CobranzaState extends State<Cobranza> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: 'PENDIENTE: ',
+                                              text:
+                                              translations['PENDIENTE'] ?? '',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
-                                              text: mostrarLocal ? ' ' : 'PENDIENTE FORANEO: ',
+                                              text: mostrarLocal ? ' ' :
+                                              'PENDIENTE FORANEO: ',
                                               style: TextStyle(fontWeight: FontWeight.bold),
                                             ),
                                             TextSpan(
@@ -567,7 +613,8 @@ class _CobranzaState extends State<Cobranza> {
                     onPressed: () {
                       Navigator.pushNamed(context, "/cobrarDeuda");
                     },
-                    child: Text(' COBRAR DEUDA',
+                    child: Text(
+                      translations['COBRAR DEUDA'] ?? '',
                       style: TextStyle(
                         fontSize: 12,
                       ),),
@@ -595,7 +642,8 @@ class _CobranzaState extends State<Cobranza> {
                       Navigator.pushNamed(context, "/cobrarAnticipo");
 
                     },
-                    child: Text(' COBRAR ANTICIPO',
+                    child: Text(
+                      translations['COBRAR ANTICIPO'] ?? '',
                       style: TextStyle(
                         color: Color.fromRGBO(212, 20, 90, 1.0), // Color del texto (blanco)
                         fontSize: 12,

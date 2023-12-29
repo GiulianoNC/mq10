@@ -24,21 +24,23 @@ class _MailScreenState extends State<MailScreen> {
       loading = true; // Mostrar indicador de progreso al enviar la solicitud
     });
 
-    final baseUrl = direc;
-    final url = Uri.parse('$baseUrl/jderest/v3/orchestrator/MQ1002N_ORCH');
+    late var api = "/jderest/v3/orchestrator/MQ1002N_ORCH";
 
-    final response = await http.post(
-      url,
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({
-        "username": usuarioGlobal,
-        "password": contraGlobal,
-        "Cliente": clienteGlobal,
-        "Correo": userEmail, // Utiliza el correo electrónico ingresado por el usuario
-      }),
-    );
+    var url = Uri.parse(direc + api);
+    final body = jsonEncode({
+      "username": usuarioGlobal,
+      "password": contraGlobal,
+      "Cliente": "64979",
+      "Correo": userEmail, // Utiliza el correo electrónico ingresado por el usuario
+
+    });
+
+    final headers = {
+      "Authorization": autorizacionGlobal,
+      'Content-Type': 'application/json',
+    };
+    final response = await http.post(url, body: body, headers: headers);
+
     print("datos "+ usuarioGlobal + contraGlobal);
 
 
@@ -86,6 +88,33 @@ class _MailScreenState extends State<MailScreen> {
           );
         },
       );
+    }
+  }
+  late Map<String, String> translations = {};
+
+  void initState() {
+    super.initState();
+
+    if (!isEnglish) {
+      translations = {
+        'CONFIRMAR': 'CONFIRMAR',
+        //menu
+        'VENTA DIRECTA': 'VENTA DIRECTA',
+        'Cliente': 'Cliente',
+        'Pedidos': 'Pedidos',
+        'Cobranza': 'Cobranza',
+        'Configuración': 'Configuración',
+      };
+    } else {
+      translations = {
+        'CONFIRMAR': 'CONFIRM',
+        //menu
+        'VENTA DIRECTA': 'DIRECT SELLING',
+        'Cliente': 'Customer',
+        'Pedidos': 'Orders',
+        'Cobranza': 'Billing',
+        'Configuración': 'Settings',
+      };
     }
   }
 
@@ -199,7 +228,8 @@ class _MailScreenState extends State<MailScreen> {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('Cliente',
+                  title: Text(
+                    translations['Cliente'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -226,7 +256,8 @@ class _MailScreenState extends State<MailScreen> {
                   leading: Icon(Icons.checklist,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Pedidos',
+                  title: Text(
+                    translations['Pedidos'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -241,7 +272,8 @@ class _MailScreenState extends State<MailScreen> {
                   leading: Icon(Icons.monetization_on,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Cobranza',
+                  title: Text(
+                    translations['Cobranza'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
@@ -256,18 +288,18 @@ class _MailScreenState extends State<MailScreen> {
                   leading: Icon(Icons.settings,
                     color: Colors.grey, // Cambia el color del icono
                   ),
-                  title: Text('Configuración',
+                  title: Text(
+                    translations['Configuración'] ?? '',
                     style: TextStyle(
                       fontSize: 15,
                       color: Colors.black,
                     ),
                   ),
-                  selected: _selectedIndex == 3,
+                  selected: _selectedIndex == 4,
                   onTap: () {
-                    _onMenuItemSelected(3);
+                    _onMenuItemSelected(4);
                   },
                 ),
-
               ],
             ),
           ),
@@ -302,7 +334,9 @@ class _MailScreenState extends State<MailScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             //  constraints: const BoxConstraints(minWidth: 88.0),
-                            child: const Text('CONFIRMAR', textAlign: TextAlign.center),
+                            child:  Text(
+                                translations['CONFIRMAR'] ?? '',
+                                textAlign: TextAlign.center),
                           ),
                           if (loading)
                             CircularProgressIndicator(), // Indicador de progreso (visible cuando loading es true)

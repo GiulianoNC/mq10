@@ -91,7 +91,7 @@ class _PedidosState extends State<Pedidos> {
   void initState() {
     super.initState();
     fetchData(); // Llama a fetchData solo una vez cuando el widget se inicia
-    if (isEnglish) {
+    if (!isEnglish) {
       translations = {
         'Fecha de Orden': 'Fecha de Orden :',
         'Razon  Social': 'Razón  Social : ',
@@ -105,7 +105,6 @@ class _PedidosState extends State<Pedidos> {
         'Pedidos': 'Pedidos',
         'Cobranza': 'Cobranza',
         'Configuración': 'Configuración',
-        'Actualización': 'Actualización',
       };
     } else {
       translations = {
@@ -493,7 +492,7 @@ class BottomSheetButtons extends StatelessWidget {
     required this.isLoading, // Agrega isLoading al constructor
   }){
     // Asigna las traducciones según el idioma
-    if (isEnglish) {
+    if (!isEnglish) {
       translations = {
         'CANCELAR': 'CANCELAR',
         'NUEVO': 'NUEVO',
