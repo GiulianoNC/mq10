@@ -325,10 +325,10 @@ class _PrimeraState extends State<Primera> {
           title: Row(
               children:[
                 Container(
-                  margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
+                  margin: EdgeInsets.fromLTRB(5, 30, 20, 10),
                   //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                   // alignment: Alignment.center,
-                  child: Image.asset("images/nombre.png",
+                  child: Image.asset("images/texto_vtadirecta.png",
                     width: 150,
                     height: 50,
                   ),

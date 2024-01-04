@@ -211,9 +211,15 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       "Authorization": autorizacionGlobal,
       'Content-Type': 'application/json',
     };
+    final body = jsonEncode(
+        {
+          "username" :usuarioGlobal,
+          "password" : contraGlobal
+        });
+
 
     try {
-      final response = await http.post(url, headers: headers);
+      final response = await http.post(url, body: body, headers: headers);
       final data = json.decode(response.body);
      // print(data);
 
@@ -393,7 +399,20 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
       cargarEstados();
     }else{
       print("estadosNombres: ${estadoModel.estadosNombres}");
-      //  print("selectedEstado: ${estadoModel.selectedEstado}");
+      // Convertir la lista de nombres de estados a una lista de mapas
+      List<Map<String, String>> estadosList = estadoModel.estadosNombres
+          .map((estado) => {"Estado": estado})
+          .toList();
+      print("estadosList: $estadosList");
+
+      // Realizar acciones con la nueva lista de estados
+      setState(() {
+        estados = estadosList;
+        estadoValue = estados.isNotEmpty ? estados[0]["Estado"] : null;
+        selectedEstado = estadoValue ?? "";
+        // Después de crear estadosList
+
+      });
     }
     if (!isEnglish) {
       translations = {
@@ -456,13 +475,6 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
     }
   }
 
- /* @override
-  void initState() {
-    super.initState();
-    cargarEstados();
-    estadoValue = estados.isNotEmpty ? estados[0]["Estado"] : null;
-  }*/
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -484,10 +496,10 @@ class _ClienteNuevoState extends State<ClienteNuevo> {
           title: Row(
               children:[
                 Container(
-                  margin: EdgeInsets.fromLTRB(5, 22, 20, 10),
+                  margin: EdgeInsets.fromLTRB(5, 30, 20, 10),
                   //padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                   // alignment: Alignment.center,
-                  child: Image.asset("images/nombre.png",
+                  child: Image.asset("images/texto_vtadirecta.png",
                     width: 150,
                     height: 50,
                   ),

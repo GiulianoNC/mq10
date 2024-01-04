@@ -273,20 +273,29 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        // Ocultar la flecha de regreso
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.grey, // Hacer el fondo transparente
+        elevation: 0, // Quitar la sombra
+        toolbarHeight: 50, // Ajustar la altura del AppBar
         // Agregar el botón de bandera en el AppBar
         actions: [
-          IconButton(
-            onPressed: _toggleLanguage, // Usar la función para cambiar el idioma y el icono
-            icon: isEnglish
-                ? Image.asset(
-              'images/uk_flag.png',
-              width: 40,
-              height: 40,
-            )
-                : Image.asset(
-              'images/spain_flag.jpg',
-              width: 40,
-              height: 40,
+          SizedBox(
+            width: 80, // Ancho del SizedBox
+            height: 120, // Altura del SizedBox
+            child: IconButton(
+              onPressed: _toggleLanguage, // Usar la función para cambiar el idioma y el icono
+              icon: isEnglish
+                  ? Image.asset(
+                'images/icono_english.png',
+                width: 100, // Ajustar el ancho
+                height: 100, // Ajustar la altura
+              )
+                  : Image.asset(
+                'images/icono_spanish.png',
+                width: 100, // Ajustar el ancho
+                height: 100, // Ajustar la altura
+              ),
             ),
           ),
         ],

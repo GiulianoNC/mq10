@@ -35,22 +35,21 @@ class _actualizacionState extends State<actualizacion> {
       dataLoaded = true;
     });
 
-    final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ1002B_ORCH');
-    final body = {
-      "username": "sbasilico",
-      "password": "Silvio71",
+    late var api = "/jderest/v3/orchestrator/MQ1002B_ORCH";
+
+    var url = Uri.parse(baseUrl + api);
+    final body = jsonEncode({
       "RAZON_SOCIAL": "MA",
       "TAX_ID": ""
+    });
+    final headers = {
+      "Authorization": autorizacionGlobal,
+      'Content-Type': 'application/json',
     };
 
     try {
-      final response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(body),
-      );
+      final response = await http.post(url, body: body, headers: headers);
+
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
@@ -79,20 +78,21 @@ class _actualizacionState extends State<actualizacion> {
       isLoadingEstados = true;
     });
 
-    final url = Uri.parse('http://quantumconsulting.servehttp.com:925/jderest/v3/orchestrator/MQ10X5A_ORCH');
-    final body = {
-      "username": "sbasilico",
-      "password": "Silvio71"
-    };
+    late var api = "/jderest/v3/orchestrator/MQ10X5A_ORCH";
 
+    var url = Uri.parse(baseUrl + api);
+    final body = jsonEncode({
+      "username" :usuarioGlobal,
+      "password" : contraGlobal,
+    });
+
+    final headers = {
+      "Authorization": autorizacionGlobal,
+      'Content-Type': 'application/json',
+    };
     try {
-      final response = await http.post(
-        url,
-        headers: <String, String>{
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(body),
-      );
+      final response = await http.post(url, body: body, headers: headers);
+
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = jsonDecode(response.body);
